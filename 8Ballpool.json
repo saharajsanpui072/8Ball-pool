@@ -1,0 +1,28 @@
+{
+  "showDialog": true,
+  "title": "🔐 8 BALL POOL LOGIN",
+  "description": "BUY WHATSAPP +91 6289600365",
+  "button": "LOGIN",
+  "toast": "✅ Successfully Logged In!",
+  "renewUrl": "https://wa.me/916289600365",
+  "devices": [
+    {
+      "device_id": "fbd988929968124f",
+      "username": "SAHARAJ",
+      "password": "12345",
+      "expire_date": "2025-10-06"
+    },
+    {
+      "device_id": "c3e3c9577ec685fc",
+      "username": "sohel",
+      "password": "SAHARAJ",
+      "expire_date": "2025-10-07"
+    },
+    {
+      "device_id": "testdevice11223344",
+      "username": "user",
+      "password": "pass",
+      "expire_date": "2025-06-01"
+    }
+  ]
+}
