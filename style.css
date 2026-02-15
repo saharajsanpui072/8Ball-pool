@@ -1,0 +1,266 @@
+:root { 
+    --primary: #fbbf24; 
+    --bg: #070914; 
+    --card: #141b2d; 
+    --success: #00ff88; 
+    --danger: #ff3e3e; 
+    --blue: #3b82f6; 
+    --whatsapp: #25d366; 
+}
+
+body { 
+    background: var(--bg); 
+    color: #fff; 
+    font-family: 'Segoe UI', sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    overflow-x: hidden; 
+}
+
+/* AUTH SCREEN */
+.auth-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh; 
+    padding: 20px; 
+    background: radial-gradient(circle, #1a2035 0%, #070914 100%); 
+}
+
+.auth-card { 
+    background: var(--card); 
+    padding: 35px 25px; 
+    border-radius: 25px; 
+    width: 100%; 
+    max-width: 360px; 
+    border: 1px solid rgba(251, 191, 36, 0.2); 
+    text-align: center; 
+}
+
+input { 
+    width: 100%; 
+    padding: 14px; 
+    margin: 10px 0; 
+    background: rgba(0,0,0,0.3); 
+    border: 1px solid #334155; 
+    color: #fff; 
+    border-radius: 12px; 
+    box-sizing: border-box; 
+    outline: none; 
+    text-align: center; 
+    font-size: 16px; 
+}
+
+.btn-auth { 
+    width: 100%; 
+    padding: 15px; 
+    background: var(--primary); 
+    color: #000; 
+    border: none; 
+    border-radius: 12px; 
+    font-weight: 900; 
+    cursor: pointer; 
+    margin-top: 10px; 
+    text-transform: uppercase; 
+}
+
+/* HEADER */
+.header { 
+    background: #141b2d; 
+    padding: 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 2px solid var(--primary); 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+}
+
+.balance-box { 
+    background: rgba(251, 191, 36, 0.1); 
+    padding: 8px 15px; 
+    border-radius: 12px; 
+    border: 1px solid var(--primary); 
+    font-weight: bold; 
+    color: var(--primary); 
+}
+
+/* ACTION BUTTONS */
+.action-btns { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px; 
+    padding: 15px; 
+}
+
+.btn-dep { 
+    background: var(--success); 
+    color: #000; 
+    border: none; 
+    padding: 14px; 
+    border-radius: 15px; 
+    font-weight: 900; 
+    cursor: pointer; 
+    font-size: 16px; 
+}
+
+.btn-wit { 
+    background: var(--blue); 
+    color: #fff; 
+    border: none; 
+    padding: 14px; 
+    border-radius: 15px; 
+    font-weight: 900; 
+    cursor: pointer; 
+    font-size: 16px; 
+}
+
+/* GAME CARD & TIMER BOX */
+.game-card { 
+    background: var(--card); 
+    border-radius: 20px; 
+    padding: 15px; 
+    margin: 0 15px 15px 15px; 
+    border: 1px solid #2d3748; 
+    text-align: center; 
+    min-height: 140px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.timer-text { 
+    font-size: 55px; 
+    font-weight: 900; 
+}
+
+.timer-blue { 
+    color: var(--blue); 
+}
+
+.timer-red { 
+    color: var(--danger); 
+}
+
+/* HD SPIN WHEEL */
+#spin-container { 
+    display: none; 
+    width: 110px; 
+    height: 110px; 
+    border: 5px solid var(--primary); 
+    border-radius: 50%; 
+    position: relative; 
+    overflow: hidden; 
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); 
+}
+
+#wheel { 
+    width: 100%; 
+    height: 100%; 
+    position: absolute; 
+    background: conic-gradient(var(--success) 0deg 90deg, var(--danger) 90deg 180deg, var(--success) 180deg 270deg, var(--danger) 270deg 360deg); 
+}
+
+.spinning { 
+    animation: spin 0.15s infinite linear; 
+}
+
+@keyframes spin { 
+    100% { transform: rotate(360deg); } 
+}
+
+/* BETTING GRID */
+.betting-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+    padding: 0 15px; 
+}
+
+.bet-btn { 
+    border: none; 
+    padding: 25px; 
+    border-radius: 20px; 
+    font-weight: 900; 
+    color: white; 
+    cursor: pointer; 
+    font-size: 24px; 
+    position: relative; 
+}
+
+.bet-btn.active-bet { 
+    background: #000 !important; 
+    border: 2px solid var(--primary); 
+    box-shadow: 0 0 20px var(--primary); 
+}
+
+/* HISTORY */
+.history-card { 
+    background: var(--card); 
+    border-radius: 15px; 
+    padding: 12px; 
+    margin: 15px; 
+    border: 1px solid #2d3748; 
+}
+
+#history-data-list { 
+    max-height: 120px; 
+    overflow-y: auto; 
+}
+
+.history-item { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 8px 5px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    font-size: 13px; 
+}
+
+/* HELP BUTTON */
+.help-btn { 
+    width: 90%; 
+    padding: 16px; 
+    background: var(--whatsapp); 
+    color: #fff; 
+    border: none; 
+    border-radius: 16px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    margin: 15px auto; 
+    display: block; 
+    font-size: 16px; 
+    text-align: center; 
+}
+
+/* MODALS */
+.modal { 
+    display: none; 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    background: #1c2237; 
+    padding: 25px 20px; 
+    border-top: 4px solid var(--primary); 
+    z-index: 2000; 
+    border-radius: 35px 35px 0 0; 
+    text-align: center; 
+    box-sizing: border-box; 
+}
+
+#result-popup { 
+    display: none; 
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    background: #1c2237; 
+    padding: 30px; 
+    border-radius: 35px; 
+    border: 3px solid var(--primary); 
+    z-index: 9999; 
+    text-align: center; 
+    width: 280px; 
+}
