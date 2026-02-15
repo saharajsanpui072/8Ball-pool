@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Boss Mall - v23.5 Ultimate Master Admin</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --primary: #fbbf24; --bg: #070914; --card: #141b2d; --success: #00ff88; --danger: #ff3e3e; --purple: #a855f7; --blue: #3b82f6; --black: #000000; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        .header { background: var(--card); padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 500; }
+        .live-dashboard { background: linear-gradient(145deg, #1e293b, #141b2d); margin: 15px; padding: 20px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .live-timer { font-size: 50px; font-weight: 900; color: var(--primary); margin: 5px 0; }
+        .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-ctrl { padding: 18px 5px; border: 1px solid #334155; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; color: #fff; transition: 0.3s; }
+        .choice-locked { background: var(--black) !important; color: var(--primary) !important; border: 2px solid var(--primary) !important; box-shadow: 0 0 15px var(--primary); }
+        .main-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .menu-btn { background: var(--card); border: 1px solid #334155; padding: 18px 10px; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .section-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; overflow-y: auto; }
+        .section-header { background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 1100; }
+        .card-item { background: var(--card); padding: 15px; border-radius: 12px; margin: 10px; border: 1px solid #2d3748; cursor: pointer; }
+        .utr-box { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success); padding: 8px; margin: 8px 0; border-radius: 8px; color: var(--success); font-weight: bold; text-align: center; font-family: monospace; }
+        .upi-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--blue); padding: 8px; margin: 8px 0; border-radius: 8px; color: var(--blue); font-weight: bold; text-align: center; font-family: monospace; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #334155; color: #fff; border-radius: 10px; box-sizing: border-box; outline: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); width: 90%; max-width: 450px; padding: 20px; border-radius: 15px; border: 1px solid var(--primary); }
+        .btn-m { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .online-badge { background: rgba(0, 255, 136, 0.1); color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 11px; border: 1px solid var(--success); display: inline-block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0; font-size: 18px;">BIG BOSS MASTER ADMIN v23.5</h2>
+        <div id="status-text" style="font-size: 10px; color: var(--success); margin-top: 5px;">🚀 Anti-Loss Mode: ACTIVE</div>
+    </div>
+
+    <div class="live-dashboard">
+        <div class="online-badge">🌐 Live Players: <span id="admin-online-show">0</span></div>
+        <div id="home-timer" class="live-timer">60</div>
+        <div style="display: flex; justify-content: space-around; margin-top: 5px;">
+            <div style="color:var(--success); font-size: 12px;">BIG: ₹<span id="home-big">0</span></div>
+            <div style="color:var(--danger); font-size: 12px;">SMALL: ₹<span id="home-small">0</span></div>
+        </div>
+        <div class="control-row">
+            <button id="lock-Big" class="btn-ctrl" style="background:var(--success); color:#000;" onclick="toggleManual('Big')">Win BIG</button>
+            <button id="lock-Small" class="btn-ctrl" style="background:var(--danger);" onclick="toggleManual('Small')">Win SMALL</button>
+        </div>
+    </div>
+
+    <div class="main-menu">
+        <div class="menu-btn" onclick="openSection('sec-users')">👥 USERS</div>
+        <div class="menu-btn" onclick="openSection('sec-online-bots')" style="border-color:var(--success);">🌐 BOTS</div>
+        <div class="menu-btn" onclick="openSection('sec-withdraws')">💳 WITHDRAWS</div>
+        <div class="menu-btn" onclick="openSection('sec-deposits')">💰 DEPOSITS</div>
+        <div class="menu-btn" onclick="openSection('sec-upi')" style="border-color:var(--blue);">⚙️ UPI ID</div>
+        <div class="menu-btn" onclick="openSection('sec-add-money')" style="border-color:var(--purple);">➕ ADD ₹</div>
+    </div>
+
+    <div id="sec-online-bots" class="section-overlay">
+        <div class="section-header"><h3>Online Bots</h3><button onclick="closeSection('sec-online-bots')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div style="padding: 20px;">
+            <label>Min Players (সর্বনিম্ন):</label>
+            <input type="number" id="bot-min" placeholder="100000">
+            <label>Max Players (সর্বোচ্চ):</label>
+            <input type="number" id="bot-max" placeholder="200000">
+            <button class="btn-m" style="background:var(--success); color:#000;" onclick="saveBotSettings()">SAVE SETTINGS</button>
+        </div>
+    </div>
+
+    <div id="sec-users" class="section-overlay">
+        <div class="section-header"><h3>Users Directory</h3><button onclick="closeSection('sec-users')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div style="padding: 15px;"><input type="text" id="user-search-input" placeholder="Search UID or Email..." onkeyup="filterUserList()"></div>
+        <div id="user-render-list"></div>
+    </div>
+
+    <div id="sec-add-money" class="section-overlay">
+        <div class="section-header"><h3>Add Money (Admin)</h3><button onclick="closeSection('sec-add-money')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div style="padding: 20px;">
+            <input type="text" id="direct-uid" placeholder="Player UID">
+            <input type="number" id="direct-amt" placeholder="Amount">
+            <button class="btn-m" style="background:var(--success); color:#000;" onclick="directDeposit()">SEND MONEY</button>
+        </div>
+    </div>
+
+    <div id="sec-deposits" class="section-overlay">
+        <div class="section-header"><h3>Pending Deposits</h3><button onclick="closeSection('sec-deposits')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div id="deposit-render-list"></div>
+    </div>
+
+    <div id="sec-withdraws" class="section-overlay">
+        <div class="section-header"><h3>Pending Withdraws</h3><button onclick="closeSection('sec-withdraws')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div id="withdraw-render-list"></div>
+    </div>
+
+    <div id="sec-upi" class="section-overlay">
+        <div class="section-header"><h3>UPI Config</h3><button onclick="closeSection('sec-upi')" class="btn-m" style="background:var(--danger); color:#fff; width:auto; padding:5px 15px;">Back</button></div>
+        <div style="padding: 20px;"><input type="text" id="admin-upi-id" placeholder="example@upi"><button class="btn-m" style="background:var(--blue); color:#fff;" onclick="updateUPISettings()">SAVE UPI</button></div>
+    </div>
+
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="m-uid" style="color:var(--primary); margin:0;">Control</h3>
+            <div style="max-height: 400px; overflow-y: auto; text-align: left; margin-top: 15px;">
+                <label>Bal: ₹<b id="m-bal-val">0</b></label>
+                <input type="number" id="m-adj-bal" placeholder="Add/Cut Balance">
+                <button class="btn-m" style="background:var(--success); color:#000;" onclick="adjustBalance()">Update Balance</button>
+                <hr style="border:0; border-top:1px solid #334155; margin:15px 0;">
+                <input type="text" id="m-new-email" placeholder="Edit Email">
+                <input type="text" id="m-new-pass" placeholder="Edit Password">
+                <button class="btn-m" style="background:var(--blue); color:#fff;" onclick="updateCredentials()">Update Info</button>
+                <textarea id="m-ban-msg" placeholder="Ban Message..."></textarea>
+                <button id="m-ban-btn" class="btn-m" style="background:var(--purple); color:#fff;" onclick="toggleBan()">Ban/Unban</button>
+                <button class="btn-m" style="background:var(--danger); color:#fff;" onclick="deleteUser()">DELETE</button>
+            </div>
+            <button class="btn-m" style="background:#475569; color:#fff; margin-top:10px;" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyAh1s75e5uKhyAb0YtlK5zFw9fna9-UyHw", authDomain: "saharaj-paid.firebaseapp.com", databaseURL: "https://saharaj-paid-default-rtdb.firebaseio.com", projectId: "saharaj-paid", storageBucket: "saharaj-paid.firebasestorage.app", appId: "1:39526305282:android:e0562119c2e9a2612ea11b" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let currentPeriod = "", bT = 0, sT = 0, manualChoice = null, selectedUserKey = "", allUsers = [], botMin = 100000, botMax = 200000;
+
+    function openSection(id) { document.getElementById(id).style.display = 'block'; }
+    function closeSection(id) { document.getElementById(id).style.display = 'none'; }
+    function closeModal() { document.getElementById('user-modal').style.display = 'none'; }
+
+    // v23.5 MASTER ENGINE
+    setInterval(() => {
+        const now = new Date(), sec = now.getSeconds();
+        currentPeriod = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('home-timer').innerText = (60 - sec).toString().padStart(2, '0');
+
+        db.ref('admin_live_bets/' + currentPeriod).on('value', snap => {
+            const v = snap.val() || { Big: 0, Small: 0 };
+            bT = v.Big || 0; sT = v.Small || 0;
+            document.getElementById('home-big').innerText = Math.floor(bT);
+            document.getElementById('home-small').innerText = Math.floor(sT);
+        });
+
+        if(sec === 0) { manualChoice = null; resetButtons(); document.getElementById('status-text').innerText = "🚀 Anti-Loss Mode: ACTIVE"; }
+        if(sec === 59) {
+            let res = manualChoice ? manualChoice : (bT < sT ? 'Big' : 'Small');
+            db.ref('game_history/' + currentPeriod).set({ period: currentPeriod, result: res, time: new Date().toLocaleTimeString() });
+        }
+    }, 1000);
+
+    function toggleManual(res) {
+        if (manualChoice === res) { manualChoice = null; resetButtons(); document.getElementById('status-text').innerText = "🚀 Anti-Loss Mode: ACTIVE"; } 
+        else { manualChoice = res; resetButtons(); document.getElementById('lock-' + res).classList.add('choice-locked'); document.getElementById('status-text').innerText = "🎮 Manual Mode: " + res.toUpperCase(); }
+    }
+    function resetButtons() { document.getElementById('lock-Big').classList.remove('choice-locked'); document.getElementById('lock-Small').classList.remove('choice-locked'); }
+
+    // ONLINE BOT LOGIC
+    function saveBotSettings() { botMin = parseInt(document.getElementById('bot-min').value); botMax = parseInt(document.getElementById('bot-max').value); db.ref('admin_settings/bot_config').set({ min: botMin, max: botMax }).then(() => alert("Saved!")); }
+    db.ref('admin_settings/bot_config').on('value', snap => { const c = snap.val() || { min: 100000, max: 200000 }; botMin = c.min; botMax = c.max; document.getElementById('bot-min').value = botMin; document.getElementById('bot-max').value = botMax; });
+    setInterval(() => { const rand = Math.floor(Math.random() * (botMax - botMin + 1)) + botMin; document.getElementById('admin-online-show').innerText = rand.toLocaleString(); db.ref('live_stats/online_players').set(rand); }, 3000);
+
+    // USER DIRECTORY (FIXED SEARCH)
+    db.ref('users').on('value', snap => {
+        allUsers = []; const list = document.getElementById('user-render-list'); list.innerHTML = "";
+        snap.forEach(u => {
+            let d = u.val(); d.key = u.key; allUsers.push(d);
+            list.innerHTML += `<div class="card-item" onclick="openUserControl('${u.key}','${d.uid}','${d.email}',${d.balance},'${d.password}',${d.isBanned||false},'${d.banMessage||''}')" style="display:flex; justify-content:space-between;">
+                <div><b>ID: ${d.uid}</b><br><small>Bal: ₹${Math.floor(d.balance)}</small></div>
+                <div style="color:${d.isBanned?'red':'green'}; font-size:10px; font-weight:bold;">${d.isBanned?'BANNED':'ACTIVE'}</div>
+            </div>`;
+        });
+    });
+    function filterUserList() {
+        const q = document.getElementById('user-search-input').value.toLowerCase();
+        const list = document.getElementById('user-render-list'); list.innerHTML = "";
+        allUsers.filter(u => u.uid.toLowerCase().includes(q) || (u.email && u.email.toLowerCase().includes(q))).forEach(d => {
+            list.innerHTML += `<div class="card-item" onclick="openUserControl('${d.key}','${d.uid}','${d.email}',${d.balance},'${d.password}',${d.isBanned||false},'${d.banMessage||''}')" style="display:flex; justify-content:space-between;">
+                <div><b>ID: ${d.uid}</b><br><small>Bal: ₹${Math.floor(d.balance)}</small></div>
+                <div style="color:${d.isBanned?'red':'green'}; font-size:10px; font-weight:bold;">${d.isBanned?'BANNED':'ACTIVE'}</div>
+            </div>`;
+        });
+    }
+
+    function openUserControl(key, uid, email, bal, pass, banned, msg) { selectedUserKey = key; document.getElementById('m-uid').innerText = "ID: " + uid; document.getElementById('m-bal-val').innerText = Math.floor(bal); document.getElementById('m-new-email').value = email || ""; document.getElementById('m-new-pass').value = pass || ""; document.getElementById('m-ban-msg').value = msg || ""; document.getElementById('user-modal').style.display = 'flex'; }
+    function adjustBalance() { const amt = parseFloat(document.getElementById('m-adj-bal').value); if(amt) db.ref('users/'+selectedUserKey+'/balance').transaction(b => (b||0)+amt).then(()=>closeModal()); }
+    function toggleBan() { const msg = document.getElementById('m-ban-msg').value; db.ref('users/'+selectedUserKey+'/isBanned').once('value', s => { const cur = s.val() || false; db.ref('users/'+selectedUserKey).update({ isBanned: !cur, banMessage: !cur ? msg : "" }).then(() => closeModal()); }); }
+    function directDeposit() { const uid = document.getElementById('direct-uid').value, amt = parseFloat(document.getElementById('direct-amt').value); db.ref('users').orderByChild('uid').equalTo(uid).once('value', s => { if(s.exists()) { let k = Object.keys(s.val())[0]; db.ref('users/'+k+'/balance').transaction(b=>(b||0)+amt).then(()=>alert("Sent!")); } else alert("UID not found!"); }); }
+
+    // DEPOSIT & WITHDRAW
+    db.ref('deposit_requests').on('value', snap => { const div = document.getElementById('deposit-render-list'); div.innerHTML = ""; snap.forEach(u => u.forEach(r => { const d = r.val(); if(d.status === "Pending") { div.innerHTML += `<div class="card-item"><b>UID: ${d.uid} | ₹${d.amount}</b><div class="utr-box">UTR: ${d.utr}</div><button onclick="approveDep('${u.key}','${r.key}',${d.amount})" class="btn-m" style="background:var(--success); color:#000;">Approve</button><button onclick="rejectDep('${u.key}','${r.key}')" class="btn-m" style="background:var(--danger); color:#fff;">Reject</button></div>`; } })); });
+    function approveDep(uk,rk,amt) { db.ref('users/'+uk+'/balance').transaction(b=>(b||0)+amt); db.ref('users/'+uk).update({isPendingDep:false}); db.ref('deposit_requests/'+uk+'/'+rk).update({status:'Approved'}); }
+    function rejectDep(uk,rk) { db.ref('users/'+uk).update({isPendingDep:false}); db.ref('deposit_requests/'+uk+'/'+rk).update({status:'Rejected'}); }
+
+    db.ref('withdraw_requests').on('value', snap => { const div = document.getElementById('withdraw-render-list'); div.innerHTML = ""; snap.forEach(u => u.forEach(r => { const d = r.val(); if(d.status === "Pending") { div.innerHTML += `<div class="card-item"><b>UID: ${d.uid} | ₹${d.amount}</b><div class="upi-box">UPI: ${d.upi}</div><button onclick="approveWith('${u.key}','${r.key}')" class="btn-m" style="background:var(--success); color:#000;">Done</button><button onclick="rejectWith('${u.key}','${r.key}', ${d.amount})" class="btn-m" style="background:var(--danger); color:#fff;">Reject</button></div>`; } })); });
+    function approveWith(uk,rk) { db.ref('withdraw_requests/'+uk+'/'+rk).update({status:'Completed'}); }
+    function rejectWith(uk,rk,amt) { if(confirm("Refund?")) { db.ref('users/'+uk+'/balance').transaction(b => (b || 0) + amt); db.ref('withdraw_requests/'+uk+'/'+rk).update({status:'Rejected'}); } }
+
+    function updateUPISettings() { const upi = document.getElementById('admin-upi-id').value; db.ref('admin_settings').update({ upi_id: upi }).then(() => alert("Saved!")); }
+    db.ref('admin_settings/upi_id').on('value', s => { if(s.exists()) document.getElementById('admin-upi-id').value = s.val(); });
+</script>
+</body>
+</html>
