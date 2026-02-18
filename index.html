@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Boss Mall - v6.2.0 Master Admin SUPREME</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root { --primary: #fbbf24; --bg: #03040a; --card: #0f172a; --success: #00ff88; --danger: #ff3e3e; --purple: #a855f7; --blue: #3b82f6; --neon-gold: 0 0 15px rgba(251, 191, 36, 0.5); }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+        .header { background: var(--card); padding: 18px; text-align: center; border-bottom: 3px solid var(--primary); box-shadow: var(--neon-gold); position: sticky; top: 0; z-index: 500; }
+        
+        /* 10 Stylish Fonts */
+        .f1 { font-family: 'Segoe UI', sans-serif; } .f2 { font-family: 'Roboto', sans-serif; } 
+        .f3 { font-family: cursive; } .f4 { font-family: monospace; }
+        .f5 { font-family: 'Georgia', serif; } .f6 { font-family: 'Impact', sans-serif; } 
+        .f7 { font-family: 'Comic Sans MS', cursive; } .f8 { font-family: 'Trebuchet MS', sans-serif; } 
+        .f9 { font-family: 'Verdana', sans-serif; } .f10 { font-family: 'Courier New', monospace; }
+
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
+        .stat-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 15px; padding: 15px; text-align: center; }
+        .stat-card b { font-size: 20px; color: var(--primary); }
+        .stat-card span { font-size: 11px; display: block; margin-top: 5px; color: #94a3b8; text-transform: uppercase; }
+
+        .live-dashboard { background: radial-gradient(circle at top, #1e293b, #03040a); margin: 0 15px 15px 15px; padding: 25px 20px; border-radius: 25px; border: 2px solid var(--primary); text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .live-timer { font-size: 60px; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--primary); line-height: 1; }
+        .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        .btn-ctrl { padding: 15px 5px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; font-weight: 900; cursor: pointer; text-transform: uppercase; color: #fff; position: relative; }
+        .btn-ctrl sub { display: block; font-size: 8px; font-weight: normal; color: #94a3b8; margin-top: 5px; }
+        .choice-locked { border: 2px solid #fff !important; animation: master-fire 0.6s infinite alternate; background: #ff4500 !important; }
+        
+        .main-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .menu-btn { background: var(--card); border: 1px solid #1e293b; padding: 15px 5px; border-radius: 18px; text-align: center; cursor: pointer; font-weight: bold; font-size: 11px; position: relative; }
+        .menu-btn sub { display: block; font-size: 7px; color: #64748b; margin-top: 3px; }
+        .notif-dot { position: absolute; top: 5px; right: 5px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; display: none; animation: blink 1s infinite; border: 1.5px solid #fff; }
+
+        .section-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; overflow-y: auto; padding-bottom: 50px; }
+        .section-header { background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); position: sticky; top: 0; z-index: 1100; }
+        .card-item { background: #141b2d; padding: 18px; border-radius: 18px; margin: 12px; border: 1px solid #1e293b; position: relative; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; }
+        .btn-m { width: 100%; padding: 14px; margin: 5px 0; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); width: 92%; max-width: 400px; padding: 25px; border-radius: 25px; border: 2px solid var(--primary); max-height: 85vh; overflow-y: auto; }
+        .grid-btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .ctrl-btn-square { background: #1e293b; border: 1px solid #334155; padding: 15px 5px; border-radius: 15px; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 id="display-app-name" style="margin:0; font-size: 16px; color: var(--primary);">MASTER DASHBOARD</h2>
+        <div id="status-text" style="font-size: 9px; color: var(--success); font-weight: 900; margin-top: 5px;">SYSTEM: SMART AUTO-PILOT ON</div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card"><b><span id="stat-total-users">0</span></b><span>Total Users</span></div>
+        <div class="stat-card"><b>₹<span id="stat-total-bal">0</span></b><span>Total Liability</span></div>
+    </div>
+
+    <div class="live-dashboard">
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">
+            PERIOD: <span id="admin-period-show" style="color:var(--primary)">----</span>
+        </div>
+        <div id="home-timer" class="live-timer">00</div>
+        <div class="control-row">
+            <button id="lock-Big" class="btn-ctrl" style="background:var(--success); color:#000;" onclick="toggleManual('Big')">WIN BIG<br><span id="label-big-amt">₹0</span><sub>Force Big to win</sub></button>
+            <button id="lock-Small" class="btn-ctrl" style="background:var(--danger);" onclick="toggleManual('Small')">WIN SMALL<br><span id="label-small-amt">₹0</span><sub>Force Small to win</sub></button>
+        </div>
+    </div>
+
+    <div class="main-menu">
+        <div class="menu-btn" onclick="openSection('sec-users')">USERS<sub>Player Management</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-withdraws')">WITHDRAW <div id="dot-wit" class="notif-dot"></div><sub>Payment reqs</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-deposits')">DEPOSIT <div id="dot-dep" class="notif-dot"></div><sub>Add money reqs</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-ui-ctrl')">UI DESIGNER<sub>Styles & Fonts</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-text-ctrl')">TEXT MANAGER<sub>App Titles & Labels</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-online-ctrl')">ONLINE BOTS<sub>Fake player counts</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-config')">CONFIG/UPI<sub>UPI & Bonus settings</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-link-manager')">LINKS<sub>Support & TG links</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-notif-master')">MARQUEE<sub>Scrolling news</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-ann')">BANNER<sub>Promo screen image</sub></div>
+        <div class="menu-btn" onclick="openSection('sec-maintenance')">MAINTENANCE<sub>App On/Off switch</sub></div>
+    </div>
+
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="m-uid" style="color:var(--primary); margin:0;">User Control</h3>
+            <p id="m-user-email" style="font-size:10px; color:#94a3b8;"></p>
+            <div class="grid-btn-container">
+                <div class="ctrl-btn-square" onclick="showSubCtrl('money')">💰<br>MONEY</div>
+                <div class="ctrl-btn-square" onclick="showSubCtrl('status')">🚫<br>STATUS</div>
+                <div class="ctrl-btn-square" onclick="showSubCtrl('history')">📜<br>HISTORY</div>
+                <div class="ctrl-btn-square" onclick="showSubCtrl('login')">🔑<br>LOGIN</div>
+                <div class="ctrl-btn-square" onclick="resetUserStats()" style="background:var(--primary); color:#000;">🔄<br>RESET</div>
+                <div class="ctrl-btn-square" onclick="deleteUserAccount()" style="background:var(--danger);">🗑️<br>DELETE</div>
+            </div>
+            <div id="sub-money" class="hidden-sub" style="display:none; margin-top:10px;"><input type="number" id="m-bal-val" placeholder="Wallet Balance"><button class="btn-m" onclick="updateUserField('balance', 'm-bal-val')">UPDATE BALANCE</button></div>
+            <div id="sub-status" class="hidden-sub" style="display:none; margin-top:10px;"><textarea id="m-ban-reason" placeholder="Reason..."></textarea><button class="btn-m" onclick="toggleBan()">BAN/UNBAN USER</button></div>
+            <div id="sub-login" class="hidden-sub" style="display:none; margin-top:10px;"><input id="m-new-email" placeholder="Email"><input id="m-new-pass" placeholder="Password"><button class="btn-m" onclick="updateCredentials()">SAVE INFO</button></div>
+            <div id="sub-history" class="hidden-sub" style="display:none; margin-top:10px;"><div id="m-hist-content" style="font-size:11px; max-height:120px; overflow-y:auto; border:1px solid #334155; padding:5px;"></div></div>
+            <button class="btn-m" style="background:#1e293b; margin-top:20px;" onclick="closeModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="sec-text-ctrl" class="section-overlay">
+        <div class="section-header"><h3>Text Manager</h3><button onclick="closeSection('sec-text-ctrl')" class="btn-m" style="width:auto; background:var(--danger)">X</button></div>
+        <div style="padding:15px; max-height: 80vh; overflow-y: auto;">
+            <div class="card-item">
+                <b>App Header Control</b>
+                <input id="txt-app-name" placeholder="Name"><input type="color" id="clr-app-name"><input type="number" id="sz-app-name" placeholder="Size"><select id="fnt-app-name"><option value="f1">F1</option><option value="f2">F2</option><option value="f10">F10</option></select>
+            </div>
+            <div class="card-item">
+                <b>Big/Small Button Labels</b>
+                <input id="txt-big-name" placeholder="Big Label"><input type="color" id="clr-big-name"><input type="number" id="sz-big-name" placeholder="Big Size">
+                <input id="txt-small-name" placeholder="Small Label"><input type="color" id="clr-small-name"><input type="number" id="sz-small-name" placeholder="Small Size">
+            </div>
+            <div class="card-item">
+                <b>Other Labels</b>
+                <input id="txt-period-label" placeholder="Period Label"><input id="txt-wallet-label" placeholder="Wallet Label">
+            </div>
+            <button class="btn-m" style="background:var(--success); color:#000" onclick="saveTextConfig()">SAVE ALL TEXT SETTINGS</button>
+        </div>
+    </div>
+
+    <div id="sec-online-ctrl" class="section-overlay">
+        <div class="section-header"><h3>Online Bots</h3><button onclick="closeSection('sec-online-ctrl')" class="btn-m">X</button></div>
+        <div style="padding:15px;"><div class="card-item">
+            <label>Fake Player Settings:</label>
+            <input type="number" id="on-min" placeholder="Minimum Bots"><input type="number" id="on-max" placeholder="Maximum Bots">
+            <button class="btn-m" onclick="saveOnline()">SAVE BOT COUNT</button>
+        </div></div>
+    </div>
+
+    <div id="sec-notif-master" class="section-overlay">
+        <div class="section-header"><h3>Marquee Master</h3><button onclick="closeSection('sec-notif-master')" class="btn-m">X</button></div>
+        <div style="padding:15px;"><div class="card-item">
+            <textarea id="ntf-text" placeholder="Scrolling text..."></textarea>
+            <label>Color:</label><input type="color" id="ntf-color">
+            <label>Size (px):</label><input type="number" id="ntf-size">
+            <label>Design Style:</label><select id="ntf-font"><option value="f1">D1</option><option value="f5">D5</option><option value="f10">D10</option></select>
+            <button class="btn-m" onclick="saveNotifConfig()">SAVE MARQUEE SETTINGS</button>
+        </div></div>
+    </div>
+
+    <div id="sec-users" class="section-overlay"><div class="section-header"><h3>Users</h3><button onclick="closeSection('sec-users')" class="btn-m">X</button></div><div id="user-render-list"></div></div>
+    <div id="sec-deposits" class="section-overlay"><div class="section-header"><h3>Deposits</h3><button onclick="closeSection('sec-deposits')" class="btn-m">X</button></div><div id="deposit-render-list"></div></div>
+    <div id="sec-withdraws" class="section-overlay"><div class="section-header"><h3>Withdrawals</h3><button onclick="closeSection('sec-withdraws')" class="btn-m">X</button></div><div id="withdraw-render-list"></div></div>
+    <div id="sec-config" class="section-overlay"><div class="section-header"><h3>Config</h3><button onclick="closeSection('sec-config')" class="btn-m">X</button></div><div class="card-item"><input id="admin-upi-id" placeholder="UPI ID"><input type="number" id="ref-bonus-pts"><button class="btn-m" onclick="saveConfigs()">SAVE</button></div></div>
+    <div id="sec-link-manager" class="section-overlay"><div class="section-header"><h3>Links</h3><button onclick="closeSection('sec-link-manager')" class="btn-m">X</button></div><div class="card-item"><input id="lnk-wa" placeholder="WhatsApp"><input id="lnk-tg" placeholder="Telegram"><button class="btn-m" onclick="saveLinks()">SAVE</button></div></div>
+    <div id="sec-ui-ctrl" class="section-overlay"><div class="section-header"><h3>UI Designer</h3><button onclick="closeSection('sec-ui-ctrl')" class="btn-m">X</button></div><div class="card-item"><input type="color" id="ui-primary"><input type="color" id="ui-text-clr"><input type="number" id="ui-text-sz"><select id="ui-font-select"><option value="f1">F1</option><option value="f10">F10</option></select><button class="btn-m" onclick="saveUIConfig()">SAVE UI</button></div></div>
+    <div id="sec-ann" class="section-overlay"><div class="section-header"><h3>Banner</h3><button onclick="closeSection('sec-ann')" class="btn-m">X</button></div><div class="card-item"><input id="ann-img"><input id="ann-title"><textarea id="ann-msg"></textarea><input id="ann-btn-text"><input id="ann-btn-link"><button class="btn-m" onclick="updateAnn(true)">ACTIVATE</button></div></div>
+    <div id="sec-maintenance" class="section-overlay"><div class="section-header"><h3>Maintenance</h3><button onclick="closeSection('sec-maintenance')" class="btn-m">X</button></div><div class="card-item"><select id="mt-status"><option value="false">OFF</option><option value="true">ON</option></select><textarea id="mt-msg"></textarea><input id="mt-btn-name"><input id="mt-btn-link"><button class="btn-m" onclick="saveMaintenance()">UPDATE</button></div></div>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyAh1s75e5uKhyAb0YtlK5zFw9fna9-UyHw", authDomain: "saharaj-paid.firebaseapp.com", databaseURL: "https://saharaj-paid-default-rtdb.firebaseio.com", projectId: "saharaj-paid", storageBucket: "saharaj-paid.firebasestorage.app", appId: "1:39526305282:android:e0562119c2e9a2612ea11b" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let currentPeriod = "", manualChoice = null, selectedUserKey = "";
+    const toast = (t, i='success') => Swal.fire({title: t, icon: i, timer: 1500, showConfirmButton: false, background: '#0f172a', color: '#fff'});
+
+    function openSection(id) { document.getElementById(id).style.display = 'block'; }
+    function closeSection(id) { document.getElementById(id).style.display = 'none'; }
+    function closeModal() { document.getElementById('user-modal').style.display = 'none'; }
+    function showSubCtrl(id) { document.querySelectorAll('.hidden-sub').forEach(s => s.style.display = 'none'); document.getElementById('sub-' + id).style.display = 'block'; if(id==='history') loadUserHistory(selectedUserKey); }
+
+    // Engine with Smart Auto-Win
+    setInterval(() => {
+        const now = new Date(), sec = now.getSeconds();
+        const rem = 60 - (sec % 60);
+        document.getElementById('home-timer').innerText = rem.toString().padStart(2, '0');
+        currentPeriod = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0') + now.getDate().toString().padStart(2, '0') + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('admin-period-show').innerText = currentPeriod;
+        db.ref('admin_live_bets/'+currentPeriod).on('value', s => {
+            const v = s.val() || {Big:0, Small:0};
+            document.getElementById('label-big-amt').innerText = "₹" + Math.floor(v.Big);
+            document.getElementById('label-small-amt').innerText = "₹" + Math.floor(v.Small);
+        });
+        if(rem === 5) {
+            db.ref('admin_live_bets/'+currentPeriod).once('value', s => {
+                const b = s.val()?.Big || 0, sm = s.val()?.Small || 0;
+                let res = manualChoice ? manualChoice : (b < sm ? 'Big' : 'Small');
+                db.ref('game_history/'+currentPeriod).set({ period: currentPeriod, result: res, time: new Date().toLocaleTimeString() });
+            });
+        }
+    }, 1000);
+
+    function toggleManual(res) {
+        manualChoice = (manualChoice === res) ? null : res;
+        document.querySelectorAll('.btn-ctrl').forEach(b => b.classList.remove('choice-locked'));
+        if(manualChoice) document.getElementById('lock-'+res).classList.add('choice-locked');
+    }
+
+    // Fixed Listeners (Requests)
+    db.ref('deposit_requests').on('value', snap => {
+        let p=false; const list = document.getElementById('deposit-render-list'); list.innerHTML = "";
+        snap.forEach(u => u.forEach(r => { if(r.val().status === "Pending") { p=true; list.innerHTML += `<div class="card-item"><b>${r.val().uid}</b> - ₹${r.val().amount}<br><button class="btn-m" style="background:var(--success)" onclick="approveDep('${u.key}','${r.key}',${r.val().amount})">Approve</button><button class="btn-m" style="background:var(--danger)" onclick="rejectDep('${u.key}','${r.key}')">Reject</button></div>`; } }));
+        document.getElementById('dot-dep').style.display = p ? 'block' : 'none';
+    });
+    db.ref('withdraw_requests').on('value', snap => {
+        let p=false; const list = document.getElementById('withdraw-render-list'); list.innerHTML = "";
+        snap.forEach(u => u.forEach(r => { if(r.val().status === "Pending") { p=true; list.innerHTML += `<div class="card-item"><b>${r.val().uid}</b> - ₹${r.val().amount}<br><button class="btn-m" style="background:var(--success)" onclick="approveWith('${u.key}','${r.key}')">Success</button><button class="btn-m" style="background:var(--danger)" onclick="rejectWith('${u.key}','${r.key}',${r.val().amount})">Reject</button></div>`; } }));
+        document.getElementById('dot-wit').style.display = p ? 'block' : 'none';
+    });
+
+    // Actions
+    function approveDep(u,r,a) { db.ref('users/'+u+'/balance').transaction(b=>(b||0)+a); db.ref('deposit_requests/'+u+'/'+r).update({status:'Approved'}); db.ref('users/'+u+'/notifications').push({msg: `Deposit ₹${a} Approved!`, status:'success'}); toast("Done"); }
+    function rejectDep(u,r) { db.ref('deposit_requests/'+u+'/'+r).update({status:'Rejected'}); db.ref('users/'+u+'/notifications').push({msg: `Deposit Rejected.`, status:'danger'}); toast("Done"); }
+    function approveWith(u,r) { db.ref('withdraw_requests/'+u+'/'+r).update({status:'Completed'}); db.ref('users/'+u+'/notifications').push({msg: `Withdrawal Successful!`, status:'success'}); toast("Done"); }
+    function rejectWith(u,r,a) { db.ref('users/'+u+'/balance').transaction(b=>(b||0)+a); db.ref('withdraw_requests/'+u+'/'+r).update({status:'Rejected'}); db.ref('users/'+u+'/notifications').push({msg: `Withdrawal Rejected. Refunded.`, status:'danger'}); toast("Done"); }
+
+    // User rendering & Stats
+    db.ref('users').on('value', snap => {
+        const list = document.getElementById('user-render-list'); list.innerHTML = "";
+        let count=0, total=0;
+        snap.forEach(u => { count++; total+=(u.val().balance||0); list.innerHTML += `<div class="card-item" onclick="openUserControl('${u.key}')"><b>${u.val().uid}</b><br>Bal: ₹${Math.floor(u.val().balance)}</div>`; });
+        document.getElementById('stat-total-users').innerText = count;
+        document.getElementById('stat-total-bal').innerText = Math.floor(total).toLocaleString();
+    });
+    function openUserControl(k) { selectedUserKey = k; db.ref('users/'+k).once('value', s => { const d = s.val(); document.getElementById('m-uid').innerText = d.uid; document.getElementById('m-user-email').innerText = d.email; document.getElementById('user-modal').style.display = 'flex'; }); }
+
+    // --- SAVE FUNCTIONS (FIXED) ---
+    function saveTextConfig() {
+        db.ref('admin_settings/text_config').set({
+            app: { name: document.getElementById('txt-app-name').value, color: document.getElementById('clr-app-name').value, size: document.getElementById('sz-app-name').value+"px", font: document.getElementById('fnt-app-name').value },
+            big: { name: document.getElementById('txt-big-name').value, color: document.getElementById('clr-big-name').value, size: document.getElementById('sz-big-name').value+"px" },
+            small: { name: document.getElementById('txt-small-name').value, color: document.getElementById('clr-small-name').value, size: document.getElementById('sz-small-name').value+"px" },
+            period_label: document.getElementById('txt-period-label').value,
+            wallet_label: document.getElementById('txt-wallet-label').value
+        }).then(() => toast("Text Config Saved"));
+    }
+    function saveOnline() {
+        db.ref('admin_settings/online_config').update({
+            min: parseInt(document.getElementById('on-min').value) || 0,
+            max: parseInt(document.getElementById('on-max').value) || 0
+        }).then(() => toast("Bots Config Saved"));
+    }
+    function saveNotifConfig() {
+        db.ref('admin_settings/marquee_config').set({
+            text: document.getElementById('ntf-text').value,
+            color: document.getElementById('ntf-color').value,
+            size: document.getElementById('ntf-size').value + "px",
+            font: document.getElementById('ntf-font').value
+        }).then(() => toast("Marquee Saved"));
+    }
+    function saveUIConfig() { db.ref('admin_settings/ui_custom').set({ primary: document.getElementById('ui-primary').value, text_clr: document.getElementById('ui-text-clr').value, size: document.getElementById('ui-text-sz').value + "px", font: document.getElementById('ui-font-select').value }).then(()=>toast("UI Saved")); }
+    function saveMaintenance() { db.ref('admin_settings/maintenance').update({ active: document.getElementById('mt-status').value==='true', message: document.getElementById('mt-msg').value, button_name: document.getElementById('mt-btn-name').value, button_link: document.getElementById('mt-btn-link').value }).then(()=>toast("Updated")); }
+    function saveConfigs() { db.ref('admin_settings').update({ upi_id: document.getElementById('admin-upi-id').value, referral_bonus_points: parseInt(document.getElementById('ref-bonus-pts').value) }).then(()=>toast("Config Saved")); }
+    function saveLinks() { db.ref('admin_settings/links').update({ whatsapp: document.getElementById('lnk-wa').value, telegram: document.getElementById('lnk-tg').value }).then(()=>toast("Links Saved")); }
+    function updateAnn(active) { db.ref('admin_announcement').set({ active: active, title: document.getElementById('ann-title').value, message: document.getElementById('ann-msg').value, image_url: document.getElementById('ann-img').value, button_text: document.getElementById('ann-btn-text').value, button_link: document.getElementById('ann-btn-link').value }).then(()=>toast("Banner Saved")); }
+
+    // User Sub-Actions
+    function updateUserField(f, i) { db.ref('users/'+selectedUserKey+'/'+f).set(parseFloat(document.getElementById(i).value)).then(()=>toast("Updated")); }
+    function toggleBan() { db.ref('users/'+selectedUserKey+'/isBanned').once('value', s => { db.ref('users/'+selectedUserKey).update({isBanned:!s.val(), banMessage: document.getElementById('m-ban-reason').value || "Banned"}); toast("Done"); }); }
+    function updateCredentials() { db.ref('users/'+selectedUserKey).update({email: document.getElementById('m-new-email').value, password: document.getElementById('m-new-pass').value}).then(()=>toast("Saved")); }
+    function resetUserStats() { db.ref('users/'+selectedUserKey).update({balance:0, bonusPoints:0}).then(()=>toast("Reset")); }
+    function deleteUserAccount() { db.ref('users/'+selectedUserKey).remove().then(()=>{toast("Deleted"); closeModal();}); }
+    function loadUserHistory(k) {
+        const hCont = document.getElementById('m-hist-content'); hCont.innerHTML = "Loading...";
+        db.ref('deposit_requests/' + k).once('value', s => {
+            let h = "<b>DEPOSITS:</b><br>"; s.forEach(r => { h += `₹${r.val().amount} - ${r.val().status}<br>`; });
+            db.ref('withdraw_requests/' + k).once('value', sw => {
+                h += "<br><b>WITHDRAWALS:</b><br>"; sw.forEach(rw => { h += `₹${rw.val().amount} - ${rw.val().status}<br>`; });
+                hCont.innerHTML = h;
+            });
+        });
+    }
+</script>
+</body>
+</html>
