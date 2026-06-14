@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Saharaj Terminal - Core Administration Node</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght=400;700&family=Rajdhani:wght=500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #ffffff; /* হোয়াইট ব্যাকগ্রাউন্ড */
+            color: #1e293b; /* ব্ল্যাক/ডার্ক টেক্সট */
+            overflow-x: hidden;
+        }
+        .heading-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.04); /* হোয়াইট থিমের সাথে সামঞ্জস্যপূর্ণ প্যানেল */
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.08);
+        }
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.98); /* হোয়াইট মোড মডাল */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #eab308;
+            border-radius: 3px;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            animation: blink-dot 1.2s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes blink-dot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <audio id="adminAlertAudio" src="https://assets.mixkit.co/active_storage/sfx/911/911-84.wav" preload="auto"></audio>
+
+    <div id="customAlertPanel" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-11/12 glass-panel p-4 rounded-xl hidden flex items-start gap-3 border-l-4 border-yellow-500 transition-all duration-300">
+        <div class="text-yellow-600 text-xl mt-0.5"><i class="fas fa-shield-check"></i></div>
+        <div class="flex-1">
+            <h4 id="alertPanelTitle" class="heading-font font-bold text-sm text-slate-900 tracking-wide">ADMIN SYSTEM LOG</h4>
+            <p id="alertPanelMessage" class="text-xs text-slate-700 mt-1 font-medium"></p>
+        </div>
+        <button onclick="dismissSystemAlert()" class="text-slate-500 hover:text-slate-900 transition-colors text-sm"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="flex-1 flex flex-col">
+        <header class="glass-panel sticky top-0 z-40 border-b border-slate-200 px-6 py-4 flex justify-between items-center bg-white/80">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-yellow-500 to-amber-500 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-user-crown text-white text-base"></i>
+                </div>
+                <div>
+                    <h1 class="heading-font font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-600">SAHARAJ</h1>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Terminal</p>
+                </div>
+            </div>
+            <div class="text-xs font-bold text-slate-700 bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span> SYSTEM
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+            <div class="space-y-4">
+                
+                <div class="grid grid-cols-3 gap-3 md:gap-4">
+                    
+                    <div onclick="openMatchManager('lone_wolf')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-shield-alt text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-shield-alt"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 01</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Lone Wolf Mode</h3>
+                    </div>
+
+                    <div onclick="openMatchManager('clash_squad')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-crosshairs text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-crosshairs"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 02</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Clash Squad Hub</h3>
+                    </div>
+
+                    <div onclick="openMatchManager('classic_bermuda')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-map-marked-alt text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-map-marked-alt"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 03</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Classic Bermuda</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlMarqueeCtrl')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-stream text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-stream"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 04</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Marquee Control</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlResultsCategoryFilter')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-trophy-alt text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-trophy-alt"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 05</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Results Engine</h3>
+                    </div>
+
+                    <div onclick="openUserControlTerminal()" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-users-cog text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-users-cog"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 06</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">User Terminal</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlMatchPurgeTerminal')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-trash-clock text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-trash-clock"></i></span>
+                            <span class="text-[9px] bg-yellow-500/10 text-yellow-700 px-1.5 py-0.5 rounded font-bold tracking-wide">BOX 07</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Match Purge Node</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlDepositHub')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-wallet text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-wallet"></i></span>
+                            <div class="flex items-center gap-1.5 z-20">
+                                <span id="badgeDotDeposit" class="live-dot hidden"></span>
+                                <span id="badgeCounterDeposit" class="text-xs font-bold text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">0</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Deposit Approvals</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlWithdrawalHub')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-hand-holding-usd text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-hand-holding-usd"></i></span>
+                            <div class="flex items-center gap-1.5 z-20">
+                                <span id="badgeDotWithdraw" class="live-dot hidden"></span>
+                                <span id="badgeCounterWithdraw" class="text-xs font-bold text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">0</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Withdraw Desk</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlMaintenanceCtrl')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-hammer text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-hammer"></i></span>
+                            <span id="lblDashboardMaintStatus" class="text-[8px] bg-red-600 text-white font-bold px-1.5 py-0.5 rounded tracking-wide uppercase shadow-md shadow-red-900/30">LIVE</span>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Server Maint</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlChatHub')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-headset text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-headset"></i></span>
+                            <div class="flex items-center gap-1.5 z-20">
+                                <span id="badgeDotChat" class="live-dot hidden"></span>
+                                <span id="badgeCounterChat" class="text-xs font-bold text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">0</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Support Care</h3>
+                    </div>
+
+                    <div onclick="openAdminModal('mdlSubscriptionHub')" class="glass-panel p-4 md:p-5 rounded-xl cursor-pointer hover:border-yellow-500 hover:bg-slate-50 transition-all duration-200 group flex flex-col justify-between h-24 md:h-28 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] text-7xl md:text-8xl transition-transform group-hover:scale-110 duration-300">
+                            <i class="fas fa-gem text-slate-900"></i>
+                        </div>
+                        <div class="flex justify-between items-center w-full z-10">
+                            <span class="text-yellow-600 text-sm md:text-base"><i class="fas fa-gem"></i></span>
+                            <div class="flex items-center gap-1.5 z-20">
+                                <span id="badgeDotSubscription" class="live-dot hidden"></span>
+                                <span id="badgeCounterSubscription" class="text-xs font-bold text-red-600 drop-shadow-[0_0_8px_rgba(220,38,38,0.4)]">0</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xs md:text-sm text-slate-800 tracking-wide z-10 mt-2 uppercase">Sub Approval</h3>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 opacity-30 select-none">
+                    <div class="glass-panel p-2.5 text-center rounded-lg text-[10px] text-slate-700 font-bold uppercase tracking-wider">Node 13 Reserved</div>
+                    <div class="glass-panel p-2.5 text-center rounded-lg text-[10px] text-slate-700 font-bold uppercase tracking-wider">Node 14 Reserved</div>
+                    <div class="glass-panel p-2.5 text-center rounded-lg text-[10px] text-slate-700 font-bold uppercase tracking-wider">Node 15 Reserved</div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="mdlChatHub" class="fixed inset-0 z-50 glass-modal hidden overflow-hidden flex flex-col md:flex-row">
+        <div class="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+            <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-white">
+                <span class="heading-font text-xs font-bold text-slate-800 uppercase tracking-wide">Support Channels</span>
+                <button onclick="closeAdminModal('mdlChatHub')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto divide-y divide-slate-100" id="chatChannelsListContainer"></div>
+            <button onclick="closeAdminModal('mdlChatHub')" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-xs text-slate-700 uppercase font-bold tracking-wider transition-colors border-t border-slate-200">Return Home</button>
+        </div>
+        <div class="flex-1 flex flex-col bg-white relative">
+            <div class="p-3 bg-slate-50 border-b border-slate-200 text-xs text-slate-800 font-bold uppercase flex justify-between items-center shrink-0">
+                <span id="lblActiveChatUserTitle" class="truncate max-w-[60%]">Select Operative Channel</span>
+                <button id="btnClearActiveChannelChats" onclick="executeClearActiveChannelHistory()" class="hidden text-[10px] bg-red-100 hover:bg-red-200 text-red-600 border border-red-200 px-2.5 py-1 rounded font-bold uppercase transition-colors">
+                    <i class="fas fa-trash-alt mr-1"></i> Clear History
+                </button>
+            </div>
+            <div id="chatConsoleMessagesStreamCanvas" class="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col text-xs pb-24">
+                </div>
+            <div id="chatConsoleInputControlsArea" class="absolute bottom-0 inset-x-0 p-3 border-t border-slate-200 bg-slate-50 flex gap-1.5 hidden shrink-0 z-10">
+                <input type="text" id="txtChatConsoleMsgInput" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 text-xs text-slate-800 focus:outline-none focus:border-yellow-500" placeholder="Type response...">
+                <button onclick="dispatchAdminResponseToChatStream()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-5 py-2 rounded-lg font-bold uppercase transition-colors shadow-sm"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlMarqueeCtrl" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-md glass-modal rounded-xl p-6 relative">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200">
+                <h3 class="heading-font font-bold text-sm text-slate-800 tracking-wide"><i class="fas fa-stream text-yellow-600 mr-2"></i>Marquee & UPI Configuration</h3>
+                <button onclick="closeAdminModal('mdlMarqueeCtrl')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4 text-xs text-slate-700">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Ticker Display Text</label>
+                    <input type="text" id="txtMarqueeText" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-yellow-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Background Color</label>
+                        <input type="color" id="txtMarqueeBg" class="w-full h-9 bg-slate-50 border border-slate-300 p-1 rounded-lg cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Text Fill Color</label>
+                        <input type="color" id="txtMarqueeTextColor" class="w-full h-9 bg-slate-50 border border-slate-300 p-1 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+                <div class="border-t border-slate-200 pt-3">
+                    <label class="block text-[10px] uppercase font-bold text-yellow-600 mb-1">Dynamic Payout QR Merchant UPI ID</label>
+                    <input type="text" id="txtAdminConfigUpiField" class="w-full bg-slate-50 border border-slate-300 px-3 py-2 text-yellow-600 font-bold rounded-lg focus:outline-none focus:border-yellow-500" placeholder="example@upi">
+                </div>
+                <button onclick="saveMarqueeSettingsToServer()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 rounded text-xs uppercase tracking-wider transition-all">Publish Live Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlSubscriptionHub" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-md">
+        <div class="w-full max-w-2xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0">
+                <h3 class="heading-font font-bold text-sm text-slate-800 uppercase"><i class="fas fa-gem text-yellow-600 mr-2"></i>VIP Subscription Core Pipeline</h3>
+                <button onclick="closeAdminModal('mdlSubscriptionHub')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="overflow-y-auto flex-1 my-3 space-y-4 pr-1 text-xs text-slate-700">
+                <div class="space-y-2">
+                    <h4 class="font-bold text-yellow-600 uppercase tracking-wider text-[11px] flex items-center gap-2">
+                        <span class="live-dot"></span> Pipeline Channels Control Registry
+                    </h4>
+                    <div id="subscriptionProcessingUnifiedQueueBox" class="space-y-1.5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlSubActionLauncherPrompt" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-sm glass-modal rounded-xl p-5 relative space-y-4 border border-yellow-500/30">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider"><i class="fas fa-fingerprint text-yellow-600 mr-1"></i> Verify Sub Identity</h4>
+                <button onclick="closeAdminModal('mdlSubActionLauncherPrompt')" class="text-slate-500 hover:text-slate-800 text-xs"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-700">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] space-y-1.5">
+                    <p class="text-slate-500 font-bold">User Identity: <span id="lblSubPromptUsername" class="text-slate-900"></span></p>
+                    <p class="text-slate-500 font-bold">Email Registry: <span id="lblSubPromptEmail" class="text-slate-800"></span></p>
+                    <div id="lblSubPromptExpiryCountdownBlock" class="text-slate-500 font-bold hidden flex-col gap-0.5 border-t border-slate-200 pt-1.5 mt-1">
+                        <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">Time Duration Status</p>
+                        <p id="lblSubPromptTimeRemaining" class="text-xs text-emerald-600 font-mono font-bold uppercase tracking-wide"></p>
+                    </div>
+                    <div id="lblSubPromptUtrBlock" class="text-slate-500 font-bold hidden">UTR String: <span id="lblSubPromptUtr" class="text-yellow-600 font-mono select-all bg-slate-100 px-1.5 py-0.5 rounded"></span></div>
+                </div>
+                <div id="boxSubPromptPendingControls" class="hidden space-y-2">
+                    <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wider"><i class="fas fa-info-circle mr-1"></i>Requested Option Target Context:</p>
+                    <div class="p-2 bg-yellow-500/5 border border-yellow-500/20 rounded text-[11px] text-slate-600">
+                        Target Selection: <span id="lblSubPromptRequestedPack" class="text-slate-900 font-bold"></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="commitSubHubActionRouteExecution(true)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 rounded text-[11px] uppercase tracking-wide">Authorize Pack</button>
+                        <button onclick="commitSubHubActionRouteExecution(false)" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-1.5 rounded text-[11px] uppercase tracking-wide">Reject Order</button>
+                    </div>
+                </div>
+                <div id="boxSubPromptActiveControls" class="hidden space-y-2">
+                    <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider"><i class="fas fa-check-circle mr-1"></i>Active Subscription Chronometer Live</p>
+                    <div class="grid grid-cols-2 gap-2 pb-1" id="boxStateControlPauseResumeActionWrapper">
+                        <button id="btnStateControlPauseNode" onclick="executeSubscriptionStateSwitchToggle('stopped')" class="w-full bg-amber-50 hover:bg-amber-600 text-white font-bold py-1 rounded text-[11px] uppercase tracking-wider">Stop (Pause)</button>
+                        <button id="btnStateControlResumeNode" onclick="executeSubscriptionStateSwitchToggle('approved')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 rounded text-[11px] uppercase tracking-wider">Start (Live)</button>
+                    </div>
+                    <button onclick="executeSubscriptionForcedCancellationPurge()" class="w-full bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-bold py-2 rounded text-xs uppercase tracking-widest heading-font transition-all shadow-md">
+                        Delete / Cancel Subscription
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlMatchManagerHub" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-4xl glass-modal rounded-xl p-6 relative max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-200 shrink-0">
+                <h3 class="heading-font font-bold text-sm text-slate-800 tracking-wide"><i class="fas fa-gamepad text-yellow-600 mr-2"></i>Lobby Terminal: <span id="lblActiveContextCategory" class="text-yellow-600 uppercase"></span></h3>
+                <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <button id="btnSwitchToLobbyCreationTab" onclick="toggleMatchHubLayoutTabViews('create')" class="bg-yellow-600 text-white font-bold text-[11px] px-2 py-0.5 rounded transition-colors">[Deploy Station]</button>
+                    <button id="btnSwitchToHistoryLayoutTab" onclick="toggleMatchHubLayoutTabViews('history')" class="bg-slate-100 border border-slate-300 hover:border-yellow-500 text-yellow-600 font-bold text-[11px] px-2 py-0.5 rounded transition-colors">[History Logs]</button>
+                    <button onclick="openRulesEditor()" class="bg-slate-100 border border-slate-300 text-slate-700 text-[11px] px-2 py-0.5 rounded">[Ruleset Config]</button>
+                    <button onclick="closeAdminModal('mdlMatchManagerHub')" class="text-slate-500 hover:text-slate-800 pl-1"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div id="wrapperLayoutCreationTabBlock" class="flex-1 overflow-y-auto my-4 space-y-4 pr-1">
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs text-slate-700">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Match Token ID</label>
+                            <input type="text" id="mFormId" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Entry Fare (₹)</label>
+                            <input type="number" id="mFormFee" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Total Reward Pool</label>
+                            <input type="number" id="mFormPool" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Per Kill Dividend</label>
+                            <input type="number" id="mFormKill" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Capacity Slots</label>
+                            <input type="number" id="mFormSlots" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded" value="48">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-700">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Game Structure Mode</label>
+                            <select id="mFormType" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                                <option value="Solo">Solo Combat</option>
+                                <option value="Duo">Duo Squad</option>
+                                <option value="Squad">Full 4v4 Squad</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Deployment Timestamp</label>
+                            <input type="datetime-local" id="mFormDate" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="commitNewMatchSlotToDatabase()" class="w-full bg-yellow-600 text-white font-bold py-1 rounded text-xs uppercase tracking-wider">Broadcast Slot Structure</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="wrapperLayoutHistoryTabBlock" class="flex-1 overflow-y-auto my-4 hidden pr-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="historyTabDynamicCardGridContainerLayout"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlGlobalLobbyParticularsModifierPanel" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-md">
+        <div class="w-full max-w-2xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0">
+                <h3 class="heading-font font-bold text-sm text-slate-800 uppercase"><i class="fas fa-edit text-yellow-600 mr-2"></i>Edit Lobby Parameters & Secure Room Data</h3>
+                <button onclick="closeAdminModal('mdlGlobalLobbyParticularsModifierPanel')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="overflow-y-auto flex-1 my-3 space-y-4 text-xs pr-1 text-slate-700">
+                <div class="p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-600">
+                    Target Token: <span id="lblParticularsModifierTargetToken" class="text-slate-900 font-bold"></span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div><label class="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Entry Fee (₹)</label><input type="number" id="txtParticularsFee" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded"></div>
+                    <div><label class="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Total Prize Pool</label><input type="number" id="txtParticularsPool" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded"></div>
+                    <div><label class="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Per Kill Reward</label><input type="number" id="txtParticularsKill" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded"></div>
+                    <div><label class="block text-[10px] text-slate-500 font-bold mb-1 uppercase">Max Slots Capacity</label><input type="number" id="txtParticularsSlots" class="w-full bg-white border border-slate-300 px-2 py-1 text-slate-800 rounded"></div>
+                </div>
+                <div class="p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg space-y-3">
+                    <h4 class="font-bold text-[10px] text-yellow-600 uppercase tracking-wider">Secret Room Allocation Protocols</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-[9px] text-slate-500 font-bold mb-1 uppercase">Room ID</label><input type="text" id="txtParticularsRoomId" class="w-full bg-white border border-slate-300 px-2 py-0.5 text-slate-800 rounded"></div>
+                        <div><label class="block text-[9px] text-slate-500 font-bold mb-1 uppercase">Password</label><input type="text" id="txtParticularsRoomPass" class="w-full bg-white border border-slate-300 px-2 py-0.5 text-slate-800 rounded"></div>
+                    </div>
+                </div>
+                <button onclick="launchMatchOperativeSearchScoreboardDashboardTerminal()" class="w-full bg-slate-100 border border-slate-300 text-slate-700 font-bold py-2 rounded-lg text-xs uppercase">[View Slots Sheet & Inject Scoreboard Metrics]</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="commitParticularsOverwritesToDatabase()" class="w-full bg-yellow-600 text-white font-bold py-1.5 rounded text-xs uppercase">Update Match</button>
+                    <button onclick="triggerParticularsSoftDelayedDeleteSequence()" class="w-full bg-red-50 border border-red-200 text-red-600 font-bold py-1.5 rounded text-xs uppercase">Delete Match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlScoreboardSearchEngineTerminalPopup" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0"><h3 class="heading-font font-bold text-sm text-slate-800 uppercase">Operative Ledger Target Engine</h3><button onclick="closeAdminModal('mdlScoreboardSearchEngineTerminalPopup')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="py-2 bg-slate-50 border border-slate-200 rounded-xl p-3 shrink-0 my-2">
+                <input type="text" id="txtScoreboardSearchInputField" oninput="executeScoreboardLiveSearchFilterEngine()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1 text-xs text-slate-800 focus:outline-none focus:border-yellow-500" placeholder="Type IGN parameters to screen...">
+            </div>
+            <div class="flex-1 overflow-y-auto my-2 space-y-2" id="scoreboardSearchResultsDisplayListContainer"></div>
+        </div>
+    </div>
+
+    <div id="mdlScoreboardMetricInjectionValuesPrompt" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-xs glass-modal rounded-xl p-5 relative space-y-4 border border-yellow-500/20">
+            <h4 class="font-bold text-xs text-slate-800 uppercase">Inject Node: <span id="lblScoreboardPromptPlayerIgn" class="text-yellow-600"></span></h4>
+            <div class="space-y-3 text-[11px] text-slate-700">
+                <div><label class="block font-bold text-slate-500 mb-1">Eliminations / Kills</label><input type="number" id="txtScoreboardPromptKillCount" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"></div>
+                <div><label class="block font-bold text-slate-500 mb-1">Payout Size (₹)</label><input type="number" id="txtScoreboardPromptPayoutAmt" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"></div>
+                <div><label class="block font-bold text-slate-500 mb-1">Rank Position</label><input type="text" id="txtScoreboardPromptRankSignature" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"></div>
+                <button onclick="commitScoreboardMetricsPayloadToDatabase()" class="w-full bg-yellow-600 text-white font-bold py-1.5 rounded text-xs uppercase">Inject Metrics Payload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlRulesetEditor" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-md glass-modal rounded-xl p-6 relative">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200"><h3 class="heading-font font-bold text-sm text-slate-800 uppercase">Override Mode Ruleset</h3><button onclick="closeAdminModal('mdlRulesetEditor')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="space-y-4 text-xs"><textarea id="txtRulesPayloadBody" class="w-full h-40 bg-white border border-slate-300 rounded-lg p-3 text-slate-800 font-mono focus:outline-none focus:border-yellow-500"></textarea><button onclick="saveRulesetOverridePayload()" class="w-full bg-yellow-600 text-white font-bold py-1.5 rounded uppercase">Commit Ruleset Matrix</button></div>
+        </div>
+    </div>
+
+    <div id="mdlResultsCategoryFilter" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-sm glass-modal rounded-xl p-6 text-center space-y-4">
+            <h3 class="heading-font font-bold text-sm text-slate-800 uppercase border-b border-slate-200 pb-2">Select Result Cluster</h3>
+            <div class="space-y-2 text-xs text-slate-700">
+                <button onclick="openLegacyResultsCategorySelectorBridge('clash_squad')" class="w-full bg-slate-50 hover:bg-slate-100 py-2 rounded-xl border border-slate-200">Clash Squad Lobbies</button>
+                <button onclick="openLegacyResultsCategorySelectorBridge('classic_bermuda')" class="w-full bg-slate-50 hover:bg-slate-100 py-2 rounded-xl border border-slate-200">Classic Bermuda Lobbies</button>
+                <button onclick="openLegacyResultsCategorySelectorBridge('lone_wolf')" class="w-full bg-slate-50 hover:bg-slate-100 py-2 rounded-xl border border-slate-200">Lone Wolf Lobbies</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlUserControlTerminal" class="fixed inset-0 z-50 bg-[#ffffff] hidden flex flex-col">
+        <header class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center gap-3">
+            <h3 class="heading-font font-bold text-xs text-slate-800 tracking-widest uppercase">User Management Terminal</h3>
+            <input type="text" id="txtUserSearchQuery" oninput="executeLiveSearchFilterEngine()" class="bg-white border border-slate-300 rounded-lg px-3 py-1 text-xs text-slate-800 focus:outline-none focus:border-yellow-500" placeholder="Search name or email...">
+            <button onclick="closeAdminModal('mdlUserControlTerminal')" class="bg-slate-200 text-slate-800 text-xs px-3 py-1 rounded hover:bg-slate-300">Exit View</button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 max-w-6xl w-full mx-auto"><div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="userMasterTerminalCardsGrid"></div></div>
+    </div>
+
+    <div id="mdlUserModifierOverlay" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-md glass-modal rounded-xl p-6 relative">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200"><h3 class="heading-font font-bold text-sm text-slate-800 uppercase">Modify Profile Parameters</h3><button onclick="closeAdminModal('mdlUserModifierOverlay')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="space-y-4 text-xs text-slate-700">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
+                    <p class="font-bold text-slate-600">Email ID: <span id="lblModifierUserEmail" class="text-slate-900 font-mono"></span></p>
+                    <p class="font-bold text-slate-600">Registered On: <span id="lblModifierUserRegDate" class="text-slate-900"></span></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block font-bold text-slate-500 mb-1">Username</label><input type="text" id="editUserTitleName" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800"></div>
+                    <div><label class="block font-bold text-slate-500 mb-1">Password</label><input type="text" id="editUserPassphrase" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div><label class="block font-bold text-slate-500 mb-1">Deposit Balance</label><input type="number" id="editUserDepositBal" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800"></div>
+                    <div><label class="block font-bold text-slate-500 mb-1">Winnings Balance</label><input type="number" id="editUserWinBal" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-slate-800"></div>
+                </div>
+                <div class="flex justify-between items-center gap-2 pt-1 border-t border-slate-100">
+                    <button id="btnToggleBanState" onclick="commitUserAccountBanToggle()" class="px-2 py-0.5 rounded text-[10px] text-white bg-red-600">Ban Status</button>
+                    <button id="btnToggleVerifyBadge" onclick="commitUserVerificationBadgeToggle()" class="px-2 py-0.5 rounded text-[10px] text-white bg-sky-600">Toggle Badge</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="saveUserAlteredProfileDataToServer()" class="w-full bg-yellow-600 text-white font-bold py-1 rounded text-xs uppercase">Update Profile</button>
+                    <button onclick="executeHardPurgeUserAccountFromDatabase()" class="w-full bg-red-100 border border-red-300 text-red-600 py-1 rounded text-xs uppercase font-bold hover:bg-red-200">Purge Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mdlMatchPurgeTerminal" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-2xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0"><h3 class="heading-font font-bold text-sm text-white uppercase">Archive Purge</h3><button onclick="closeAdminModal('mdlMatchPurgeTerminal')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="flex-1 overflow-y-auto my-2 divide-y divide-slate-100" id="purgeTerminalMatchesListingContainer"></div>
+        </div>
+    </div>
+
+    <div id="mdlDepositHub" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-2xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0"><h3 class="heading-font font-bold text-sm text-slate-800 uppercase">Deposit Pipeline</h3><button onclick="closeAdminModal('mdlDepositHub')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="flex-1 overflow-y-auto my-2 space-y-2" id="depositVerificationQueueContainer"></div>
+        </div>
+    </div>
+
+    <div id="mdlWithdrawalHub" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-2xl glass-modal rounded-xl p-6 relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 shrink-0"><h3 class="heading-font font-bold text-sm text-slate-800 uppercase">Withdraw Queue</h3><button onclick="closeAdminModal('mdlWithdrawalHub')" class="text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button></div>
+            <div class="flex-1 overflow-y-auto my-2 space-y-2" id="withdrawalDisbursalQueueContainer"></div>
+        </div>
+    </div>
+
+    <div id="mdlMaintenanceCtrl" class="fixed inset-0 z-50 overflow-y-auto hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="w-full max-w-sm glass-modal rounded-xl p-6 text-center space-y-4 relative">
+            <button onclick="closeAdminModal('mdlMaintenanceCtrl')" class="absolute right-4 top-4 text-slate-500 hover:text-slate-800"><i class="fas fa-times"></i></button>
+            <div id="lblMaintPanelIndicatorStatus" class="font-bold text-xs text-slate-500 uppercase tracking-widest">SYNC STATE...</div>
+            <button id="btnToggleMaintModeNode" onclick="executeSystemMaintenanceModeSwitchToggle()" class="w-full bg-yellow-600 text-white font-bold py-1.5 rounded text-xs uppercase">Toggle Firewall</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAowYuI5H_BN9PhAMsrJu8RON_lp32iwOI",
+            authDomain: "saharaj-tournament-application.firebaseapp.com",
+            databaseURL: "https://saharaj-tournament-application-default-rtdb.firebaseio.com",
+            projectId: "saharaj-tournament-application",
+            storageBucket: "saharaj-tournament-application.firebasestorage.app"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentTargetCategoryScope = "clash_squad";
+        let masterMatchesDataset = {};
+        let masterUsersDataset = {};
+        let targetSelectedUserModifierId = null;
+        let activeAdminChatChannelIdRef = null;
+        let systemMaintenanceStateLive = false;
+        
+        let cacheSelectedResultMatchIdContextKey = null;
+        let cacheSelectedResultUserSessionIdContextKey = null;
+        let cacheSelectedPopupActiveSubscriptionRecordKey = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeMasterSystemDataSyncEngine();
+        });
+
+        // 🛠️ ইউনিভার্সাল পপআপ ক্লোজিং মেকানিজম (Modal Close Button Fix)
+        function closeAdminModal(modalId) {
+            const modalElement = document.getElementById(modalId);
+            if (modalElement) {
+                modalElement.classList.add('hidden');
+            }
+        }
+
+        function triggerSystemAlert(message) {
+            const audio = document.getElementById('adminAlertAudio');
+            if(audio) audio.play().catch(()=>{});
+            const alertPanel = document.getElementById('customAlertPanel');
+            document.getElementById('alertPanelMessage').innerText = message;
+            alertPanel.classList.remove('hidden');
+            setTimeout(dismissSystemAlert, 5000);
+        }
+
+        function dismissSystemAlert() {
+            const alertPanel = document.getElementById('customAlertPanel');
+            if(alertPanel) alertPanel.classList.add('hidden');
+        }
+
+        function openAdminModal(domId) {
+            document.getElementById(domId).classList.remove('hidden');
+        }
+
+        function toggleMatchHubLayoutTabViews(targetViewId) {
+            const creationView = document.getElementById('wrapperLayoutCreationTabBlock');
+            const historyView = document.getElementById('wrapperLayoutHistoryTabBlock');
+            const btnCreate = document.getElementById('btnSwitchToLobbyCreationTab');
+            const btnHistory = document.getElementById('btnSwitchToHistoryLayoutTab');
+
+            if (targetViewId === 'create') {
+                creationView.classList.remove('hidden');
+                historyView.classList.add('hidden');
+                btnCreate.className = "bg-yellow-600 text-white font-bold text-xs px-2.5 py-0.5 rounded";
+                btnHistory.className = "bg-slate-100 border border-slate-300 text-yellow-600 font-bold text-xs px-2.5 py-0.5 rounded";
+            } else {
+                creationView.classList.add('hidden');
+                historyView.classList.remove('hidden');
+                btnCreate.className = "bg-slate-100 border border-slate-300 text-yellow-600 font-bold text-xs px-2.5 py-0.5 rounded";
+                btnHistory.className = "bg-yellow-600 text-white font-bold text-xs px-2.5 py-0.5 rounded";
+                renderSaharajCompliantHistoryCardStructures();
+            }
+        }
+
+        function initializeMasterSystemDataSyncEngine() {
+            database.ref('system_marquee').on('value', snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    document.getElementById('txtMarqueeText').value = data.text || "";
+                    document.getElementById('txtMarqueeBg').value = data.bgColor || "#1e1b4b";
+                    document.getElementById('txtMarqueeTextColor').value = data.textColor || "#f43f5e";
+                }
+            });
+            
+            database.ref('system_settings/admin_upi').on('value', snapshot => {
+                if(snapshot.exists()) {
+                    document.getElementById('txtAdminConfigUpiField').value = snapshot.val() || "";
+                }
+            });
+
+            database.ref('system_settings/maintenance_mode').on('value', snapshot => {
+                systemMaintenanceStateLive = snapshot.val() === true;
+                const topLabel = document.getElementById('lblDashboardMaintStatus');
+                const panelLabel = document.getElementById('lblMaintPanelIndicatorStatus');
+                const btnNode = document.getElementById('btnToggleMaintModeNode');
+
+                if(systemMaintenanceStateLive) {
+                    topLabel.innerText = "ACTIVE";
+                    topLabel.className = "text-[7px] text-red-500 font-bold uppercase";
+                    panelLabel.innerText = "FIREWALL ON: APP BLOCKED";
+                    btnNode.innerText = "Deactivate Firewall (Go Live)";
+                } else {
+                    topLabel.innerText = "LIVE";
+                    topLabel.className = "text-[7px] text-emerald-500 font-bold uppercase";
+                    panelLabel.innerText = "FIREWALL OFF: SYSTEM PUBLIC";
+                    btnNode.innerText = "Activate Maintenance Firewall";
+                }
+            });
+
+            database.ref('matches').on('value', snapshot => {
+                masterMatchesDataset = snapshot.val() || {};
+                renderSaharajCompliantHistoryCardStructures();
+                renderMatchPurgeTerminalListing();
+            });
+
+            database.ref('users').on('value', snapshot => {
+                masterUsersDataset = snapshot.val() || {};
+                executeLiveSearchFilterEngine();
+                executeScoreboardLiveSearchFilterEngine();
+                synchronizeSubscriptionInteractiveQueueEngine(); 
+                executeRealtimeGlobalSecurityEnforcer(); 
+            });
+
+            database.ref('deposits').on('value', snapshot => {
+                const list = snapshot.val() || {};
+                const keys = Object.keys(list);
+                let pendingCount = 0;
+                const queueBox = document.getElementById('depositVerificationQueueContainer');
+                if(queueBox) queueBox.innerHTML = "";
+
+                keys.forEach(k => {
+                    const d = list[k];
+                    if(d.status === 'pending') {
+                        pendingCount++;
+                        let userEmailMapping = "N/A Account Info";
+                        if(masterUsersDataset && masterUsersDataset[d.uid]) {
+                            userEmailMapping = masterUsersDataset[d.uid].email || "Omitted";
+                        }
+                        
+                        let row = document.createElement('div');
+                        row.className = "glass-panel p-3 rounded-lg flex justify-between items-center gap-2 border-l-4 border-yellow-500 text-xs bg-white shadow-sm";
+                        row.innerHTML = `
+                            <div class="truncate max-w-[70%]">
+                                <p class="text-slate-900 font-bold">${d.username}</p>
+                                <p class="text-[10px] text-slate-500 font-semibold truncate bg-slate-100 px-1 rounded inline-block mt-0.5">${userEmailMapping}</p>
+                                <p class="text-yellow-600 font-bold mt-1">₹ ${parseFloat(d.amount).toFixed(2)}</p>
+                                <p class="text-slate-500 font-mono text-[10px] truncate select-all mt-0.5">UTR: ${d.utr}</p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="executeActionOnDepositNode('${k}', true)" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">Approve</button>
+                                <button onclick="executeActionOnDepositNode('${k}', false)" class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">Reject</button>
+                            </div>
+                        `;
+                        if(queueBox) queueBox.appendChild(row);
+                    }
+                });
+
+                if(pendingCount === 0 && queueBox) {
+                    queueBox.innerHTML = `<p class="text-slate-400 italic text-center text-xs py-4">No pending deposit validations.</p>`;
+                }
+                document.getElementById('badgeCounterDeposit').innerText = pendingCount;
+                document.getElementById('badgeDotDeposit').classList.toggle('hidden', pendingCount === 0);
+            });
+
+            database.ref('withdrawals').on('value', snapshot => {
+                const list = snapshot.val() || {};
+                const keys = Object.keys(list);
+                let pendingCount = 0;
+                const queueBox = document.getElementById('withdrawalDisbursalQueueContainer');
+                if(queueBox) queueBox.innerHTML = "";
+
+                keys.forEach(k => {
+                    const w = list[k];
+                    if(w.status === 'pending') {
+                        pendingCount++;
+                        let userEmailMapping = "N/A Account Info";
+                        if(masterUsersDataset && masterUsersDataset[w.uid]) {
+                            userEmailMapping = masterUsersDataset[w.uid].email || "Omitted";
+                        }
+
+                        let row = document.createElement('div');
+                        row.className = "glass-panel p-3 rounded-lg flex justify-between items-center gap-2 border-l-4 border-yellow-500 text-xs bg-white shadow-sm";
+                        row.innerHTML = `
+                            <div class="truncate max-w-[70%]">
+                                <p class="text-slate-900 font-bold">${w.username}</p>
+                                <p class="text-[10px] text-slate-500 font-semibold truncate bg-slate-100 px-1 rounded inline-block mt-0.5">${userEmailMapping}</p>
+                                <p class="text-yellow-600 font-bold mt-1">₹ ${parseFloat(w.amount).toFixed(2)}</p>
+                                <p class="text-slate-500 font-mono text-[10px] truncate select-all mt-0.5">UPI: ${w.targetUpi}</p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="executeActionOnWithdrawalNode('${k}', true)" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">Disburse</button>
+                                <button onclick="executeActionOnWithdrawalNode('${k}', false)" class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">Reject</button>
+                            </div>
+                        `;
+                        if(queueBox) queueBox.appendChild(row);
+                    }
+                });
+
+                if(pendingCount === 0 && queueBox) {
+                    queueBox.innerHTML = `<p class="text-slate-400 italic text-center text-xs py-4">No open withdrawal requests.</p>`;
+                }
+                document.getElementById('badgeCounterWithdraw').innerText = pendingCount;
+                document.getElementById('badgeDotWithdraw').classList.toggle('hidden', pendingCount === 0);
+            });
+
+            database.ref('subscriptions').on('value', snapshot => {
+                synchronizeSubscriptionInteractiveQueueEngine();
+            });
+
+            database.ref('chats').on('value', snapshot => {
+                const list = snapshot.val() || {};
+                const keys = Object.keys(list);
+                let globalUnreadChatNotificationsCount = 0;
+                const channelsBox = document.getElementById('chatChannelsListContainer');
+                if(channelsBox) channelsBox.innerHTML = "";
+
+                const sortedChannels = keys.map(k => ({ id: k, data: list[k] })).sort((a, b) => {
+                    let tsA = a.data.metadata ? (a.data.metadata.lastActivityTimestamp || 0) : 0;
+                    let tsB = b.data.metadata ? (b.data.metadata.lastActivityTimestamp || 0) : 0;
+                    return tsB - tsA;
+                });
+
+                sortedChannels.forEach(chan => {
+                    const meta = chan.data.metadata || { username: "Guest Session", email: "N/A" };
+                    let channelIsUnread = (meta.adminReadState === false);
+                    if(channelIsUnread) {
+                        globalUnreadChatNotificationsCount++;
+                    }
+
+                    if(activeAdminChatChannelIdRef === chan.id && channelIsUnread) {
+                        database.ref(`chats/${chan.id}/metadata/adminReadState`).set(true);
+                        channelIsUnread = false;
+                    }
+
+                    let item = document.createElement('div');
+                    item.className = `p-2.5 cursor-pointer hover:bg-slate-100 flex justify-between items-center transition-colors ${activeAdminChatChannelIdRef === chan.id ? 'bg-yellow-50 border-l-2 border-yellow-500' : ''}`;
+                    item.setAttribute('onclick', `activateSelectedChatCommunicationPipeline('${chan.id}')`);
+                    item.innerHTML = `
+                        <div class="text-xs truncate max-w-[80%]">
+                            <span class="text-slate-900 font-bold">${meta.username}</span>
+                            <p class="text-[9px] text-slate-500 truncate">${meta.email}</p>
+                        </div>
+                        <div>${channelIsUnread ? '<span class="live-dot"></span>' : ''}</div>
+                    `;
+                    if(channelsBox) channelsBox.appendChild(item);
+                });
+
+                document.getElementById('badgeCounterChat').innerText = globalUnreadChatNotificationsCount;
+                document.getElementById('badgeDotChat').classList.toggle('hidden', globalUnreadChatNotificationsCount === 0);
+            });
+        }
+
+        function executeRealtimeGlobalSecurityEnforcer() {
+            Object.keys(masterUsersDataset).forEach(uid => {
+                const node = masterUsersDataset[uid];
+                if (!node || uid === 'admin') return;
+                
+                if (node.password !== node.lastEnforcedPassword) {
+                    database.ref(`users/${uid}`).update({
+                        currentDeviceId: "FORCE_OUT_" + Date.now(),
+                        lastEnforcedPassword: node.password || ""
+                    });
+                }
+            });
+        }
+
+        function synchronizeSubscriptionInteractiveQueueEngine() {
+            database.ref('subscriptions').once('value', snapshot => {
+                const dataBox = document.getElementById('subscriptionProcessingUnifiedQueueBox');
+                if (!dataBox) return;
+                dataBox.innerHTML = "";
+
+                const subDatasetMap = snapshot.val() || {};
+                const keysArray = Object.keys(subDatasetMap);
+                
+                let pendingRows = [];
+                let activeRows = [];
+                let pendingNotificationCount = 0;
+
+                keysArray.forEach(k => {
+                    const subObj = subDatasetMap[k];
+                    let linkedEmail = "N/A Account Context";
+                    if (masterUsersDataset && masterUsersDataset[subObj.uid]) {
+                        linkedEmail = masterUsersDataset[subObj.uid].email || "Omitted";
+                    }
+
+                    if (subObj.status === 'pending') {
+                        pendingNotificationCount++;
+                        pendingRows.push({ key: k, data: subObj, email: linkedEmail });
+                    } else if (subObj.status === 'approved' || subObj.status === 'stopped') {
+                        if (parseInt(subObj.expiryTimeStamp || 0) <= Date.now()) {
+                            executeSubscriptionAutoPurgeLifecycleNode(k, subObj.uid);
+                            return;
+                        }
+                        activeRows.push({ key: k, data: subObj, email: linkedEmail });
+                    }
+                });
+
+                pendingRows.sort((a,b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
+                activeRows.sort((a,b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
+
+                pendingRows.forEach(item => {
+                    let divNode = document.createElement('div');
+                    divNode.className = "p-3 rounded-lg bg-slate-50 border border-slate-200 hover:border-yellow-500 cursor-pointer flex justify-between items-center transition-all";
+                    divNode.setAttribute('onclick', `launchSubscriptionInteractivePromptModal('${item.key}', false)`);
+                    divNode.innerHTML = `
+                        <div class="truncate max-w-[85%] text-xs">
+                            <p class="text-slate-800 font-bold uppercase tracking-wide"><i class="fas fa-hourglass-half text-yellow-600 mr-1.5 animate-pulse"></i>${item.data.username || 'Unknown Operator'}</p>
+                            <p class="text-[10px] text-slate-500 font-medium truncate mt-0.5">${item.email}</p>
+                        </div>
+                        <span class="text-xs bg-yellow-500/10 text-yellow-700 px-2 py-0.5 rounded uppercase font-bold tracking-widest text-[9px]">Pending</span>
+                    `;
+                    dataBox.appendChild(divNode);
+                });
+
+                activeRows.forEach(item => {
+                    let textBadgeStatus = "Authorized";
+                    let classStyleText = "text-emerald-600";
+                    let classStyleBg = "bg-emerald-50";
+                    
+                    if(item.data.status === 'stopped') {
+                        textBadgeStatus = "Paused";
+                        classStyleText = "text-amber-600";
+                        classStyleBg = "bg-amber-50";
+                    }
+
+                    let divNode = document.createElement('div');
+                    divNode.className = "p-3 rounded-lg bg-white border border-slate-200 hover:border-yellow-500 cursor-pointer flex justify-between items-center transition-all opacity-90";
+                    divNode.setAttribute('onclick', `launchSubscriptionInteractivePromptModal('${item.key}', true)`);
+                    divNode.innerHTML = `
+                        <div class="truncate max-w-[85%] text-xs">
+                            <p class="text-slate-700 font-bold uppercase tracking-wide">✅ ${item.data.username || 'Unknown Operator'}</p>
+                            <p class="text-[10px] text-slate-400 font-medium truncate mt-0.5">${item.email}</p>
+                        </div>
+                        <span class="text-xs ${classStyleBg} ${classStyleText} px-2 py-0.5 rounded uppercase font-bold tracking-widest text-[9px]">Authorized</span>
+                    `;
+                    dataBox.appendChild(divNode);
+                });
+
+                if (pendingRows.length === 0 && activeRows.length === 0) {
+                    dataBox.innerHTML = `<p class="text-slate-400 italic text-center text-xs py-8">No subscription pipelines logged inside master registries.</p>`;
+                }
+
+                document.getElementById('badgeCounterSubscription').innerText = pendingNotificationCount;
+                document.getElementById('badgeDotSubscription').classList.toggle('hidden', pendingNotificationCount === 0);
+            });
+        }
+
+        function launchSubscriptionInteractivePromptModal(subKey, isCurrentlyActiveFlag) {
+            cacheSelectedPopupActiveSubscriptionRecordKey = subKey;
+            
+            database.ref('subscriptions/' + subKey).once('value', snapshot => {
+                const subObj = snapshot.val();
+                if (!subObj) return;
+
+                let matchedEmail = "N/A Linked Account Context";
+                if (masterUsersDataset && masterUsersDataset[subObj.uid]) {
+                    matchedEmail = masterUsersDataset[subObj.uid].email || "Omitted";
+                }
+
+                document.getElementById('lblSubPromptUsername').innerText = subObj.username || "Unknown Operator";
+                document.getElementById('lblSubPromptEmail').innerText = matchedEmail;
+
+                const utrBlock = document.getElementById('lblSubPromptUtrBlock');
+                const pndControls = document.getElementById('boxSubPromptPendingControls');
+                const actControls = document.getElementById('boxSubPromptActiveControls');
+                const countdownBlock = document.getElementById('lblSubPromptExpiryCountdownBlock');
+
+                if (!isCurrentlyActiveFlag) {
+                    utrBlock.classList.remove('hidden');
+                    countdownBlock.classList.add('hidden');
+                    document.getElementById('lblSubPromptUtr').innerText = subObj.utr || "N/A";
+                    document.getElementById('lblSubPromptRequestedPack').innerText = `₹${subObj.packPrice}.00 Pack Selection Engine (${subObj.daysTotal} Days)`;
+                    
+                    pndControls.classList.remove('hidden');
+                    actControls.classList.add('hidden');
+                } else {
+                    utrBlock.classList.add('hidden');
+                    countdownBlock.classList.remove('hidden');
+                    
+                    const deltaDiff = parseInt(subObj.expiryTimeStamp) - Date.now();
+                    if(deltaDiff <= 0) {
+                        document.getElementById('lblSubPromptTimeRemaining').innerText = "Expired Node Pipeline";
+                    } else {
+                        const d = Math.max(0, Math.floor(deltaDiff / (1000 * 60 * 60 * 24)));
+                        const h = Math.max(0, Math.floor((deltaDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+                        let displayTimerString = `${d} Days, ${h} Hours left`;
+                        if(subObj.status === 'stopped') {
+                            displayTimerString += " (PAUSED)";
+                        }
+                        document.getElementById('lblSubPromptTimeRemaining').innerText = displayTimerString;
+                    }
+
+                    if(subObj.status === 'stopped') {
+                        document.getElementById('btnStateControlPauseNode').classList.add('hidden');
+                        document.getElementById('btnStateControlResumeNode').classList.remove('hidden');
+                    } else {
+                        document.getElementById('btnStateControlPauseNode').classList.remove('hidden');
+                        document.getElementById('btnStateControlResumeNode').classList.add('hidden');
+                    }
+
+                    pndControls.classList.add('hidden');
+                    actControls.classList.remove('hidden');
+                }
+
+                openAdminModal('mdlSubActionLauncherPrompt');
+            });
+        }
+
+        function commitSubHubActionRouteExecution(isApprovedFlag) {
+            const currentSubKeyId = cacheSelectedPopupActiveSubscriptionRecordKey;
+            if (!currentSubKeyId) return;
+
+            if (!isApprovedFlag) {
+                database.ref('subscriptions/' + currentSubKeyId).remove().then(() => {
+                    triggerSystemAlert("Subscription bundle order rejected and removed from memory matrices.");
+                    closeAdminModal('mdlSubActionLauncherPrompt');
+                    synchronizeSubscriptionInteractiveQueueEngine();
+                });
+                return;
+            }
+
+            database.ref('subscriptions/' + currentSubKeyId).once('value', snapshot => {
+                const subDataNode = snapshot.val();
+                if (!subDataNode || subDataNode.status !== 'pending') return;
+
+                const packagePriceValue = parseFloat(subDataNode.packPrice || 200);
+                const packageDurationDays = parseInt(subDataNode.daysTotal || 7);
+                const dailyFixedSplitPayout = 30; 
+
+                const approvedTimeEpoch = Date.now();
+                const totalDurationMilliseconds = packageDurationDays * 24 * 60 * 60 * 1000;
+                const computedExpiryTimeEpoch = approvedTimeEpoch + totalDurationMilliseconds;
+
+                database.ref('users/' + subDataNode.uid + '/isVerified').set(true);
+
+                database.ref('users/' + subDataNode.uid + '/depositBalance').transaction(currentBal => {
+                    return (parseFloat(currentBal || 0) + dailyFixedSplitPayout);
+                }, (txErr, txCommitted) => {
+                    if (txCommitted) {
+                        database.ref('subscriptions/' + currentSubKeyId).update({
+                            status: "approved",
+                            approvedTimeStamp: approvedTimeEpoch,
+                            expiryTimeStamp: computedExpiryTimeEpoch,
+                            lastClaimTimeStamp: approvedTimeEpoch, 
+                            claimsExecutedCount: 1, 
+                            dailyPayoutSplitAmount: dailyFixedSplitPayout,
+                            totalReturnTarget: packagePriceValue === 200 ? 210 : (packagePriceValue === 400 ? 450 : 900)
+                        }).then(() => {
+                            triggerSystemAlert(`Premium pipeline contract activated. Day 1 payout directed.`);
+                            closeAdminModal('mdlSubActionLauncherPrompt');
+                            synchronizeSubscriptionInteractiveQueueEngine();
+                        });
+                    }
+                });
+            });
+        }
+
+        function executeSubscriptionStateSwitchToggle(targetNextStatusString) {
+            const currentSubKeyId = cacheSelectedPopupActiveSubscriptionRecordKey;
+            if (!currentSubKeyId) return;
+
+            database.ref('subscriptions/' + currentSubKeyId).once('value', snapshot => {
+                const subObj = snapshot.val();
+                if(!subObj) return;
+
+                const now = Date.now();
+
+                if(targetNextStatusString === 'stopped') {
+                    const dynamicRemainingTimeGap = parseInt(subObj.expiryTimeStamp) - now;
+                    database.ref('subscriptions/' + currentSubKeyId).update({
+                        status: "stopped",
+                        savedRemainingTimeGap: dynamicRemainingTimeGap
+                    }).then(() => {
+                        triggerSystemAlert("Subscription processing pipeline PAUSED.");
+                        closeAdminModal('mdlSubActionLauncherPrompt');
+                        synchronizeSubscriptionInteractiveQueueEngine();
+                    });
+                } else if(targetNextStatusString === 'approved') {
+                    const stashedGap = parseInt(subObj.savedRemainingTimeGap || 0);
+                    const computedNewExpiryStamp = now + stashedGap;
+                    
+                    database.ref('subscriptions/' + currentSubKeyId).update({
+                        status: "approved",
+                        expiryTimeStamp: computedNewExpiryStamp,
+                        lastClaimTimeStamp: now 
+                    }).then(() => {
+                        triggerSystemAlert("Subscription processing pipeline RESUMED.");
+                        closeAdminModal('mdlSubActionLauncherPrompt');
+                        synchronizeSubscriptionInteractiveQueueEngine();
+                    });
+                }
+            });
+        }
+
+        function executeSubscriptionForcedCancellationPurge() {
+            const currentSubKeyId = cacheSelectedPopupActiveSubscriptionRecordKey;
+            if (!currentSubKeyId) return;
+
+            database.ref('subscriptions/' + currentSubKeyId).once('value', snapshot => {
+                const subObj = snapshot.val();
+                if (!subObj) return;
+
+                database.ref('users/' + subObj.uid + '/isVerified').set(false);
+                database.ref('subscriptions/' + currentSubKeyId).remove().then(() => {
+                    triggerSystemAlert("Active premium data sub node cancelled.");
+                    closeAdminModal('mdlSubActionLauncherPrompt');
+                    synchronizeSubscriptionInteractiveQueueEngine();
+                });
+            });
+        }
+
+        function executeSubscriptionAutoPurgeLifecycleNode(subIdKey, userSessionIdKey) {
+            database.ref('users/' + userSessionIdKey + '/isVerified').set(false);
+            database.ref('subscriptions/' + subIdKey).remove().then(() => {
+                synchronizeSubscriptionInteractiveQueueEngine();
+            });
+        }
+
+        // ⚠️ লাইভ সাপোর্ট কেয়ার উইন্ডো কন্ট্রোলার এবং স্ক্রল প্রোটোকল ফিক্স (Fix)
+        function activateSelectedChatCommunicationPipeline(channelIdKey) {
+            if(activeAdminChatChannelIdRef) database.ref('chats/' + activeAdminChatChannelIdRef + '/messages').off();
+            activeAdminChatChannelIdRef = channelIdKey;
+            
+            document.getElementById('chatConsoleInputControlsArea').classList.remove('hidden');
+            document.getElementById('btnClearActiveChannelChats').classList.remove('hidden');
+            document.getElementById('lblActiveChatUserTitle').innerText = masterUsersDataset[channelIdKey] ? masterUsersDataset[channelIdKey].username : "Active Channel";
+
+            database.ref(`chats/${channelIdKey}/metadata`).update({ adminReadState: true });
+
+            database.ref('chats/' + channelIdKey + '/messages').on('value', snapshot => {
+                const streamBox = document.getElementById('chatConsoleMessagesStreamCanvas');
+                if(!streamBox) return; streamBox.innerHTML = "";
+                const msgs = snapshot.val() || {};
+                const msgKeys = Object.keys(msgs).sort((a,b) => msgs[a].timestamp - msgs[b].timestamp);
+
+                let genuinePlayerMessageCount = 0;
+                let hasBotWelcomeAttached = false;
+                let hasBotWaitingAttached = false;
+                let lastBotWelcomeKey = null;
+                let lastBotWaitingKey = null;
+
+                msgKeys.forEach(k => {
+                    if (msgs[k].sender === 'player') genuinePlayerMessageCount++;
+                    if (msgs[k].sender === 'bot' && msgs[k].botType === 'welcome') { hasBotWelcomeAttached = true; lastBotWelcomeKey = k; }
+                    if (msgs[k].sender === 'bot' && msgs[k].botType === 'waiting') { hasBotWaitingAttached = true; lastBotWaitingKey = k; }
+                });
+
+                if (genuinePlayerMessageCount === 0 && !hasBotWelcomeAttached) {
+                    const welcomeBotId = "BOT_WELCOME_" + Date.now();
+                    database.ref(`chats/${channelIdKey}/messages/${welcomeBotId}`).set({
+                        msgId: welcomeBotId,
+                        sender: "bot",
+                        botType: "welcome",
+                        body: "এডমিনের রেসপন্স পাওয়ার আগে আপনি পরপর ২টির বেশি মেসেজ পাঠাতে পারবেন না। অনুগ্রহ করে প্রয়োজনীয় তথ্য দিয়ে দুটো মেসেজ করে অপেক্ষা করুন।",
+                        timestamp: Date.now()
+                    });
+                    return;
+                }
+
+                if (genuinePlayerMessageCount >= 2 && !hasBotWaitingAttached) {
+                    const waitingBotId = "BOT_WAITING_" + Date.now();
+                    database.ref(`chats/${channelIdKey}/messages/${waitingBotId}`).set({
+                        msgId: waitingBotId,
+                        sender: "bot",
+                        botType: "waiting",
+                        body: "Please Wait (অ্যাডমিন আপনার চ্যাট রিভিউ না করা পর্যন্ত অনুগ্রহ করে অপেক্ষা করুন)",
+                        timestamp: Date.now()
+                    });
+                    return;
+                }
+
+                if (msgKeys.length > 0 && msgs[msgKeys[msgKeys.length - 1]].sender === 'admin') {
+                    let purgePayload = {};
+                    if (hasBotWelcomeAttached && lastBotWelcomeKey) purgePayload[lastBotWelcomeKey] = null;
+                    if (hasBotWaitingAttached && lastBotWaitingKey) purgePayload[lastBotWaitingKey] = null;
+                    
+                    if (Object.keys(purgePayload).length > 0) {
+                        database.ref(`chats/${channelIdKey}/messages`).update(purgePayload);
+                        return;
+                    }
+                }
+
+                msgKeys.forEach(k => {
+                    const m = msgs[k]; 
+                    const isAdmin = m.sender === 'admin';
+                    const isBot = m.sender === 'bot';
+                    
+                    let msgBlock = document.createElement('div');
+                    
+                    if (isBot) {
+                        // কোনো রোবোটিক বোট মেসেজ রেন্ডার হবে না (টোটাল ফিল্টারিং রুলস অ্যাপ্লাইড)
+                        return;
+                    } else {
+                        msgBlock.className = `max-w-[80%] p-2 rounded-lg text-[11px] ${isAdmin ? 'bg-yellow-500 text-slate-950 ml-auto rounded-tr-none font-semibold' : 'bg-slate-100 text-slate-800 mr-auto rounded-tl-none shadow-sm'}`;
+                        msgBlock.innerHTML = `<p>${m.body}</p><span class="text-[8px] opacity-60 block text-right mt-0.5 font-mono">${new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+                    }
+                    streamBox.appendChild(msgBlock);
+                });
+                
+                // পপআপ খোলার পর এবং নতুন চ্যাট আসার পর এরিয়া অটোমেটিক নিচে যাওয়ার জন্য টাইমার ফিক্স
+                setTimeout(() => { streamBox.scrollTop = streamBox.scrollHeight; }, 50);
+            });
+            
+            // চ্যাট চ্যানেলে ক্লিক করার সাথে সাথে প্রপার মডাল ইন্টারফেস সামনে খুলে যাবে
+            openAdminModal('mdlChatHub');
+        }
+
+        function dispatchAdminResponseToChatStream() {
+            const field = document.getElementById('txtChatConsoleMsgInput'); 
+            const txt = field.value.trim();
+            if(!txt || !activeAdminChatChannelIdRef) return;
+            
+            const msgId = "MSG_" + Date.now();
+            database.ref('chats/' + activeAdminChatChannelIdRef + '/messages/' + msgId).set({ 
+                msgId: msgId, 
+                sender: "admin", 
+                body: txt, 
+                timestamp: Date.now() 
+            }).then(() => {
+                field.value = ""; 
+                database.ref('chats/' + activeAdminChatChannelIdRef + '/metadata').update({
+                    lastActivityTimestamp: Date.now(),
+                    adminReadState: true
+                });
+            });
+        }
+
+        function executeClearActiveChannelHistory() {
+            if (!activeAdminChatChannelIdRef) return;
+            if (confirm("Are you absolutely sure you want to completely wipe out all messages within this specific channel registry?")) {
+                database.ref(`chats/${activeAdminChatChannelIdRef}/messages`).remove().then(() => {
+                    database.ref(`chats/${activeAdminChatChannelIdRef}/metadata`).update({
+                        lastActivityTimestamp: Date.now(),
+                        adminReadState: true
+                    });
+                    triggerSystemAlert("Target chat communication history has been completely wiped clean.");
+                });
+            }
+        }
+
+        function saveMarqueeSettingsToServer() {
+            const marqueePayload = {
+                text: document.getElementById('txtMarqueeText').value.trim(),
+                bgColor: document.getElementById('txtMarqueeBg').value,
+                textColor: document.getElementById('txtMarqueeTextColor').value
+            };
+            const upiStringValue = document.getElementById('txtAdminConfigUpiField').value.trim() || "admin@upi";
+            database.ref('system_marquee').set(marqueePayload);
+            database.ref('system_settings/admin_upi').set(upiStringValue).then(() => {
+                triggerSystemAlert("Marquee ticker text and payee UPI configs propagated live.");
+                closeAdminModal('mdlMarqueeCtrl');
+            });
+        }
+
+        function openMatchManager(categoryKey) {
+            currentTargetCategoryScope = categoryKey;
+            document.getElementById('lblActiveContextCategory').innerText = categoryKey.replace('_', ' ');
+            toggleMatchHubLayoutTabViews('create'); 
+            openAdminModal('mdlMatchManagerHub');
+        }
+
+        function openRulesEditor() {
+            database.ref('rulesets/' + currentTargetCategoryScope).once('value', snapshot => {
+                document.getElementById('txtRulesPayloadBody').value = snapshot.val() || "";
+                openAdminModal('mdlRulesetEditor');
+            });
+        }
+
+        function saveRulesetOverridePayload() {
+            const textRules = document.getElementById('txtRulesPayloadBody').value.trim();
+            database.ref('rulesets/' + currentTargetCategoryScope).set(textRules).then(() => {
+                triggerSystemAlert("Ruleset matrices configuration published live.");
+                closeAdminModal('mdlRulesetEditor');
+            });
+        }
+
+        // ⚠️ ব্রডকাস্ট স্লট স্ট্রাকচার ফিক্সড কোড মেকানিজম (Fix)
+        function commitNewMatchSlotToDatabase() {
+            const id = document.getElementById('mFormId').value.trim();
+            const fee = parseFloat(document.getElementById('mFormFee').value);
+            const pool = parseFloat(document.getElementById('mFormPool').value);
+            const kill = parseFloat(document.getElementById('mFormKill').value);
+            const slots = parseInt(document.getElementById('mFormSlots').value) || 48;
+            const type = document.getElementById('mFormType').value;
+            const rawDate = document.getElementById('mFormDate').value;
+
+            if(!id || isNaN(fee) || isNaN(pool) || isNaN(kill) || !rawDate) {
+                triggerSystemAlert("All initialization slot inputs parameters are mandatory.");
+                return;
+            }
+            const targetUnixStamp = new Date(rawDate).getTime();
+            const payload = {
+                matchId: id,
+                category: currentTargetCategoryScope,
+                entryFee: fee,
+                totalPrize: pool,
+                perKillReward: kill,
+                maxSlots: slots,
+                gameMode: type,
+                startTimeStamp: targetUnixStamp,
+                isActive: true,
+                roomID: "",
+                roomPassword: "",
+                participants: {}
+            };
+            
+            // ফায়ারবেসে সাকসেসফুলি ম্যাচ পুশ ওভাররাইড লজিক
+            database.ref('matches/' + id).set(payload).then(() => {
+                triggerSystemAlert(`Match structure [${id}] broadcasted safely.`);
+                
+                // ক্র্যাশ ফিক্স: সঠিক নাম অনুযায়ী ডাইরেক্ট কার্ড রেন্ডারিং ফাংশন কল করা হলো
+                renderSaharajCompliantHistoryCardStructures();
+                toggleMatchHubLayoutTabViews('history'); 
+            });
+        }
+
+        function renderSaharajCompliantHistoryCardStructures() {
+            const gridContainer = document.getElementById('historyTabDynamicCardGridContainerLayout');
+            if (!gridContainer) return;
+            gridContainer.innerHTML = "";
+            const keys = Object.keys(masterMatchesDataset);
+            let matchQuantityCounter = 0;
+
+            keys.forEach(k => {
+                const m = masterMatchesDataset[k];
+                if (m.category !== currentTargetCategoryScope || m.isHiddenFromAdmin === true) return;
+                matchQuantityCounter++;
+                const countJoined = m.participants ? Object.keys(m.participants).length : 0;
+                
+                let cardUiBlock = document.createElement('div');
+                cardUiBlock.className = "bg-white border border-slate-200 p-3 rounded-lg flex flex-col justify-between gap-2 text-xs shadow-sm";
+                cardUiBlock.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] bg-yellow-500/10 text-yellow-700 font-bold px-1.5 py-0.2 rounded uppercase">${m.gameMode}</span>
+                        <h4 class="font-bold text-slate-800">ID: ${m.matchId}</h4>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 bg-slate-50 p-1.5 rounded text-[10px] text-slate-600 font-medium border border-slate-100">
+                        <p>Fee: <span class="text-yellow-600">₹${parseFloat(m.entryFee).toFixed(2)}</span></p>
+                        <p>Pool: <span class="text-emerald-600">₹${parseFloat(m.totalPrize).toFixed(2)}</span></p>
+                        <p>Slots: <span class="text-purple-600">${countJoined}/${m.maxSlots}</span></p>
+                        <p>Kill: <span class="text-red-600">₹${parseFloat(m.perKillReward).toFixed(2)}</span></p>
+                    </div>
+                    <button onclick="launchGlobalLobbyParticularsModifierPopup('${k}')" class="w-full bg-yellow-50 hover:bg-yellow-100 border border-yellow-300 text-yellow-700 text-[10px] font-bold py-1 rounded uppercase transition-colors">Scoreboard / Edit</button>
+                `;
+                gridContainer.appendChild(cardUiBlock);
+            });
+
+            if (matchQuantityCounter === 0) {
+                gridContainer.innerHTML = `<div class="col-span-full py-6 text-center text-slate-400 italic text-xs">No active slots located within channel arrays.</div>`;
+            }
+        }
+
+        function launchGlobalLobbyParticularsModifierPopup(matchIdKey) {
+            cacheSelectedResultMatchIdContextKey = matchIdKey;
+            const m = masterMatchesDataset[matchIdKey];
+            document.getElementById('lblParticularsModifierTargetToken').innerText = m.matchId;
+            document.getElementById('txtParticularsFee').value = m.entryFee || 0;
+            document.getElementById('txtParticularsPool').value = m.totalPrize || 0;
+            document.getElementById('txtParticularsKill').value = m.perKillReward || 0;
+            document.getElementById('txtParticularsSlots').value = m.maxSlots || 48;
+            document.getElementById('txtParticularsRoomId').value = m.roomID || "";
+            document.getElementById('txtParticularsRoomPass').value = m.roomPassword || "";
+            openAdminModal('mdlGlobalLobbyParticularsModifierPanel');
+        }
+
+        function commitParticularsOverwritesToDatabase() {
+            database.ref('matches/' + cacheSelectedResultMatchIdContextKey).update({
+                entryFee: parseFloat(document.getElementById('txtParticularsFee').value) || 0,
+                totalPrize: parseFloat(document.getElementById('txtParticularsPool').value) || 0,
+                perKillReward: parseFloat(document.getElementById('txtParticularsKill').value) || 0,
+                maxSlots: parseInt(document.getElementById('txtParticularsSlots').value) || 48,
+                roomID: document.getElementById('txtParticularsRoomId').value.trim(),
+                roomPassword: document.getElementById('txtParticularsRoomPass').value.trim()
+            }).then(() => {
+                triggerSystemAlert("Match configurations overwritten successfully inside servers.");
+                closeAdminModal('mdlGlobalLobbyParticularsModifierPanel');
+                renderSaharajCompliantHistoryCardStructures();
+            });
+        }
+
+        function triggerParticularsSoftDelayedDeleteSequence() {
+            if (!cacheSelectedResultMatchIdContextKey) return;
+            database.ref('matches/' + cacheSelectedResultMatchIdContextKey).update({
+                isHiddenFromAdmin: true,
+                category: "history_terminal",
+                startTimeStamp: Date.now() + (5 * 60 * 60 * 1000) 
+            }).then(() => {
+                triggerSystemAlert("Lobby queued for temporary client view preservation. Admin view purged.");
+                closeAdminModal('mdlGlobalLobbyParticularsModifierPanel');
+                renderSaharajCompliantHistoryCardStructures();
+            });
+        }
+
+        function launchMatchOperativeSearchScoreboardDashboardTerminal() {
+            document.getElementById('txtScoreboardSearchInputField').value = "";
+            executeScoreboardLiveSearchFilterEngine();
+            openAdminModal('mdlScoreboardSearchEngineTerminalPopup');
+        }
+
+        function executeScoreboardLiveSearchFilterEngine() {
+            const searchResultsBox = document.getElementById('scoreboardSearchResultsDisplayListContainer');
+            if (!searchResultsBox || !cacheSelectedResultMatchIdContextKey) return;
+            searchResultsBox.innerHTML = "";
+
+            const queryText = document.getElementById('txtScoreboardSearchInputField').value.toLowerCase().trim();
+            const targetMatchInstance = masterMatchesDataset[cacheSelectedResultMatchIdContextKey];
+            if (!targetMatchInstance) return;
+
+            const participantsSubMap = targetMatchInstance.participants || {};
+            const participantKeys = Object.keys(participantsSubMap);
+
+            if (participantKeys.length === 0) {
+                searchResultsBox.innerHTML = `<p class="text-slate-400 italic text-center py-4 text-xs">No entries located.</p>`;
+                return;
+            }
+
+            participantKeys.forEach(pk => {
+                const playerRecord = participantsSubMap[pk];
+                if (queryText && !(playerRecord.ign || "").toLowerCase().includes(queryText)) return;
+
+                let playerLinkedEmail = "Email: N/A Account Context";
+                if (masterUsersDataset && masterUsersDataset[pk]) {
+                    playerLinkedEmail = masterUsersDataset[pk].email || "Email Omitted";
+                }
+
+                let cardComponentBlock = document.createElement('div');
+                cardComponentBlock.className = "p-2.5 bg-white border border-slate-200 rounded-lg flex justify-between items-center cursor-pointer text-xs hover:border-yellow-500 shadow-sm";
+                cardComponentBlock.setAttribute('onclick', `launchScoreboardMetricModificationPrompt('${pk}', '${playerRecord.ign || 'Unknown IGN'}')`);
+                cardComponentBlock.innerHTML = `
+                    <div>
+                        <p class="text-slate-900 font-bold">IGN: ${playerRecord.ign || 'N/A'}</p>
+                        <p class="text-[10px] text-slate-500 font-medium font-mono">${playerLinkedEmail}</p>
+                        <p class="text-[9px] text-slate-400 mt-0.5">Rank: ${playerRecord.rank || 'Pending'} | Kills: ${playerRecord.killCount || 0}</p>
+                    </div>
+                    <span class="text-emerald-600 font-bold">₹${parseFloat(playerRecord.payoutAmount || 0).toFixed(2)}</span>
+                `;
+                searchResultsBox.appendChild(cardComponentBlock);
+            });
+        }
+
+        function launchScoreboardMetricModificationPrompt(userUidKey, playerIgnString) {
+            cacheSelectedResultUserSessionIdContextKey = userUidKey;
+            document.getElementById('lblScoreboardPromptPlayerIgn').innerText = playerIgnString;
+            const uniqueOperativeProfileMeta = masterMatchesDataset[cacheSelectedResultMatchIdContextKey].participants[userUidKey];
+
+            document.getElementById('txtScoreboardPromptKillCount').value = uniqueOperativeProfileMeta.killCount || 0;
+            document.getElementById('txtScoreboardPromptPayoutAmt').value = uniqueOperativeProfileMeta.payoutAmount || 0;
+            document.getElementById('txtScoreboardPromptRankSignature').value = uniqueOperativeProfileMeta.rank || "";
+            openAdminModal('mdlScoreboardMetricInjectionValuesPrompt');
+        }
+
+        function commitScoreboardMetricsPayloadToDatabase() {
+            const distributionPayout = parseFloat(document.getElementById('txtScoreboardPromptPayoutAmt').value) || 0;
+            const payloadPathNode = `matches/${cacheSelectedResultMatchIdContextKey}/participants/${cacheSelectedResultUserSessionIdContextKey}`;
+            
+            database.ref('users/' + cacheSelectedResultUserSessionIdContextKey + '/winBalance').transaction(currentVaultBalanceValue => {
+                return (parseFloat(currentVaultBalanceValue || 0) + distributionPayout);
+            }, (balanceTxError, executionTxCommitted) => {
+                if (executionTxCommitted) {
+                    database.ref(payloadPathNode).update({
+                        killCount: parseInt(document.getElementById('txtScoreboardPromptKillCount').value) || 0,
+                        payoutAmount: distributionPayout,
+                        rank: document.getElementById('txtScoreboardPromptRankSignature').value.trim() || "Pending"
+                    }).then(() => {
+                        triggerSystemAlert("Performance telemetry payload appended safely and cash successfully added to User Win Balance.");
+                        closeAdminModal('mdlScoreboardMetricInjectionValuesPrompt');
+                        executeScoreboardLiveSearchFilterEngine(); 
+                    });
+                } else {
+                    triggerSystemAlert("Transaction Error: Could not inject balance.");
+                }
+            });
+        }
+
+        function openLegacyResultsCategorySelectorBridge(catId) {
+            closeAdminModal('mdlResultsCategoryFilter');
+            openMatchManager(catId);
+            toggleMatchHubLayoutTabViews('history');
+        }
+
+        function openUserControlTerminal() {
+            document.getElementById('txtUserSearchQuery').value = "";
+            executeLiveSearchFilterEngine();
+            openAdminModal('mdlUserControlTerminal');
+        }
+
+        function executeLiveSearchFilterEngine() {
+            const container = document.getElementById('userMasterTerminalCardsGrid');
+            if(!container) return; container.innerHTML = "";
+
+            const query = document.getElementById('txtUserSearchQuery').value.toLowerCase().trim();
+            Object.keys(masterUsersDataset).forEach(k => {
+                const u = masterUsersDataset[k]; if(u.email === 'admin@saharaj.com') return; 
+                if(query && !(u.username || "").toLowerCase().includes(query) && !(u.email || "").toLowerCase().includes(query)) return;
+
+                let card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center text-xs cursor-pointer hover:border-yellow-500 shadow-sm";
+                card.setAttribute('onclick', `launchProfileModifierOverlay('${k}')`);
+                card.innerHTML = `
+                    <div class="truncate max-w-[65%]">
+                        <span class="text-slate-900 font-bold font-mono block truncate">${u.email || 'No Email Registered'}</span> 
+                        <span class="text-[10px] text-slate-500 font-semibold mt-0.5 inline-block">Name: ${u.username || 'Operant'}</span>
+                        ${u.isVerified ? '<span class="text-sky-500 ml-1"><i class="fas fa-badge-check"></i></span>' : ''}
+                        ${u.isBanned ? '<span class="text-[9px] bg-red-100 text-red-600 font-bold uppercase ml-1 px-1 rounded">Banned</span>' : ''}
+                    </div>
+                    <div class="text-right text-[10px] text-slate-500 shrink-0 border-l border-slate-100 pl-2">
+                        <p>Dep: <span class="text-yellow-600 font-bold">₹${parseFloat(u.depositBalance || 0).toFixed(2)}</span></p>
+                        <p>Vault: <span class="text-emerald-600 font-bold">₹${parseFloat(u.winBalance || 0).toFixed(2)}</span></p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function launchProfileModifierOverlay(userSessionUid) {
+            targetSelectedUserModifierId = userSessionUid;
+            const u = masterUsersDataset[userSessionUid];
+
+            document.getElementById('lblModifierUserEmail').innerText = u.email || "Omitted / Guest Account";
+            
+            if(u.regDate) {
+                document.getElementById('lblModifierUserRegDate').innerText = u.regDate;
+            } else if (u.timestamp) {
+                const formattedDate = new Date(u.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                document.getElementById('lblModifierUserRegDate').innerText = formattedDate;
+            } else {
+                document.getElementById('lblModifierUserRegDate').innerText = "Data Not Tracked";
+            }
+
+            document.getElementById('editUserTitleName').value = u.username || "";
+            document.getElementById('editUserPassphrase').value = u.password || "";
+            document.getElementById('editUserDepositBal').value = u.depositBalance || 0;
+            document.getElementById('editUserWinBal').value = u.winBalance || 0;
+            openAdminModal('mdlUserModifierOverlay');
+        }
+
+        function saveUserAlteredProfileDataToServer() {
+            database.ref('users/' + targetSelectedUserModifierId).update({
+                username: document.getElementById('editUserTitleName').value.trim(),
+                password: document.getElementById('editUserPassphrase').value.trim(),
+                depositBalance: parseFloat(document.getElementById('editUserDepositBal').value) || 0,
+                winBalance: parseFloat(document.getElementById('editUserWinBal').value) || 0
+            }).then(() => {
+                triggerSystemAlert("Account credentials synchronized successfully.");
+                closeAdminModal('mdlUserModifierOverlay');
+            });
+        }
+
+        function commitUserAccountBanToggle() {
+            const currentStatus = masterUsersDataset[targetSelectedUserModifierId].isBanned === true;
+            database.ref('users/' + targetSelectedUserModifierId + '/isBanned').set(!currentStatus).then(() => {
+                triggerSystemAlert("Account suspension matrix state updated.");
+                closeAdminModal('mdlUserModifierOverlay');
+            });
+        }
+
+        function commitUserVerificationBadgeToggle() {
+            const currentStatus = masterUsersDataset[targetSelectedUserModifierId].isVerified === true;
+            database.ref('users/' + targetSelectedUserModifierId + '/isVerified').set(!currentStatus).then(() => {
+                triggerSystemAlert("Blue checkmark badge mapping toggled successfully.");
+                closeAdminModal('mdlUserModifierOverlay');
+            });
+        }
+
+        function executeHardPurgeUserAccountFromDatabase() {
+            if (confirm("আপনি কি নিশ্চিত যে এই ইউজারটিকে সম্পূর্ণ ডিলিট করতে চান?")) {
+                if (confirm("এটি কিন্তু আর ফিরিয়ে আনা যাবে না! আপনি কি ১০০% নিশ্চিত?")) {
+                    database.ref('users/' + targetSelectedUserModifierId).remove().then(() => {
+                        triggerSystemAlert("Profile configuration strictly removed from cluster records.");
+                        closeAdminModal('mdlUserModifierOverlay');
+                        executeLiveSearchFilterEngine();
+                    });
+                }
+            }
+        }
+
+        function renderMatchPurgeTerminalListing() {
+            const container = document.getElementById('purgeTerminalMatchesListingContainer');
+            if(!container) return; container.innerHTML = "";
+            
+            Object.keys(masterMatchesDataset).forEach(k => {
+                const m = masterMatchesDataset[k]; if(m.category !== 'history_terminal') return;
+                let item = document.createElement('div');
+                item.className = "py-2 flex justify-between items-center text-xs text-slate-800";
+                item.innerHTML = `<div><p class="font-bold">ID: ${m.matchId}</p></div><button onclick="executeActionOnMatchNodeDelete('${k}')" class="bg-red-100 border border-red-200 text-red-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase hover:bg-red-200">Purge</button>`;
+                container.appendChild(item);
+            });
+        }
+
+        function executeActionOnMatchNodeDelete(matchIdToken) {
+            database.ref('matches/' + matchIdToken).remove().then(() => triggerSystemAlert("Lobby node erased from registers."));
+        }
+
+        function executeActionOnDepositNode(txIdKey, isApprovedFlag) {
+            database.ref('deposits/' + txIdKey).once('value', snapshot => {
+                const d = snapshot.val(); if(!d || d.status !== 'pending') return;
+                if(isApprovedFlag) {
+                    database.ref('users/' + d.uid + '/depositBalance').transaction(b => (b || 0) + parseFloat(d.amount), (err, committed) => {
+                        if(committed) database.ref('deposits/' + txIdKey + '/status').set('approved').then(() => triggerSystemAlert("Deposit ledger balance updated."));
+                    });
+                } else {
+                    database.ref('deposits/' + txIdKey).remove().then(() => triggerSystemAlert("Deposit pipeline request deleted."));
+                }
+            });
+        }
+
+        function executeActionOnWithdrawalNode(wdIdKey, isSuccessFlag) {
+            database.ref('withdrawals/' + wdIdKey).once('value', snapshot => {
+                const w = snapshot.val(); if(!w || w.status !== 'pending') return;
+                if(isSuccessFlag) {
+                    database.ref('withdrawals/' + wdIdKey + '/status').set('completed').then(() => triggerSystemAlert("Withdrawal disbursal marked successful."));
+                } else {
+                    database.ref('users/' + w.uid + '/winBalance').transaction(b => (b || 0) + parseFloat(w.amount), (err, committed) => {
+                        if(committed) database.ref('withdrawals/' + wdIdKey).remove().then(() => triggerSystemAlert("Ticket rejected, funds returned to winner vault."));
+                    });
+                }
+            });
+        }
+
+        function executeSystemMaintenanceModeSwitchToggle() {
+            database.ref('system_settings/maintenance_mode').set(!systemMaintenanceStateLive).then(() => triggerSystemAlert("Global core firewall states shifted."));
+        }
+    </script>
+</body>
+</html>
